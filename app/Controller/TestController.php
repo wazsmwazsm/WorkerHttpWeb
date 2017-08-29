@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 class TestController {
-    public function test() {
-        return "test\n";
+    public function test($request) {
+        return json_encode($request->requset);
     }
 }
