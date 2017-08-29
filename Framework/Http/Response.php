@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Http;
 use Workerman\Protocols\Http;
+use Framework\Config;
 
 /**
  * HTTP response.
@@ -103,7 +104,7 @@ Class Response {
      */
     public static function abort($code, $info = NULL) {
         // if param $info not set
-        if(($msg = $info) === NULL) {
+        if(($msg = $info) === NULL || ! Config::get('debug')) {
             $msg = array_key_exists($code, self::$statusTexts) ? self::$statusTexts[$code] : "there's something wrong";
         }
         // set http response header
