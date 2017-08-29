@@ -18,7 +18,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/walkor/mysql/zipball/745d62528372e0ca7f1be05f029493b9fce2dc76",
                 "reference": "745d62528372e0ca7f1be05f029493b9fce2dc76",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-pdo": "*",
@@ -56,7 +62,13 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/walkor/Workerman/zipball/01aadefdc3e7bf65dd0956d1d876bc9d27cd9156",
                 "reference": "01aadefdc3e7bf65dd0956d1d876bc9d27cd9156",
-                "shasum": ""
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://dl.laravel-china.org/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
             },
             "require": {
                 "ext-pcntl": "*",
