@@ -52,9 +52,8 @@ class Route {
      *
      * @return String
      */
-    public static function dispatch() {
+    public static function dispatch(Requests $request) {
         try {
-            $request = new Requests();
             // get request param
             $uri = self::uriParse(parse_url(($request->server->REQUEST_URI))['path']);
             $method = $request->server->REQUEST_METHOD;

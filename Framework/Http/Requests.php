@@ -41,13 +41,13 @@ Class Requests {
 
     /**
      * get http request param.
+     *
+     * @param Array $request
      */
-    public function __construct() {
-        $this->requset = (object) $_REQUEST;
-        $this->server  = (object) $_SERVER;
-        $this->cookie  = (object) $_COOKIE;
-        $this->session = (object) $_SESSION;
-        $this->files   = (object) $_FILES;
+    public function __construct(Array $request) {
+        $this->requset = (object) array_merge($request['get'], $request['post']);
+        $this->server  = (object) $request['server'];
+        $this->cookie  = (object) $request['cookie'];
     }
 
     /**
