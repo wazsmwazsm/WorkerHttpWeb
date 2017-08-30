@@ -103,8 +103,8 @@ Class Response {
      * @return string
      */
     public static function abort($code, $info = NULL) {
-        // if param $info not set
-        if(($msg = $info) === NULL || ! Config::get('debug')) {
+        // if param $info not set or not debug
+        if(($msg = $info) === NULL || ! Config::get('app.debug')) {
             $msg = array_key_exists($code, self::$statusTexts) ? self::$statusTexts[$code] : "there's something wrong";
         }
         // set http response header
