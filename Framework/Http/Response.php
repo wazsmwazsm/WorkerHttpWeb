@@ -12,6 +12,16 @@ use Framework\Config;
 Class Response {
 
     /**
+     * create http response header.
+     *
+     * @param  string  $str
+     * @return void
+     */
+    public static function header($str) {
+        Http::header($str);
+    }
+
+    /**
      * create http response.
      *
      * @param  int  $code
@@ -24,7 +34,7 @@ Class Response {
             $msg = array_key_exists($code, HttpCache::$codes) ? HttpCache::$codes[$code] : "there's something wrong";
         }
         // set http response header
-        Http::header("HTTP/1.1 ".$code." ".$msg);
+        self::header("HTTP/1.1 ".$code." ".$msg);
         $html = '<html><head><title>'.$code.' '.$msg.'</title></head><body><center><h3>'.$msg.'</h3></center></body></html>';
         return $html;
     }
