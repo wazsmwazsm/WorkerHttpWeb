@@ -29,10 +29,22 @@ class Route {
             // not catch, trigger Fatal error
             throw new \LogicException("method $method accept 2 params!\n");
         }
-        // check uri rule
-        $uri = strpos($params[0], '/') === 0 ? rtrim($params[0], '/') : '/'.rtrim($params[0], '/');
         // create map tree, exp: $map_tree['/a/b']['get'] = 'controller@method'
-        self::$map_tree[$uri][strtoupper($method)] = $params[1];
+        self::$map_tree[self::uriParse($params[0])][strtoupper($method)] = $params[1];
+    }
+
+    /**
+     * Parse uri.
+     *
+     * @param  string  $uri
+     * @return void
+     */
+    public static function uriParse($uri) {
+        // make uri as /a/b/c mode
+        $uri = $uri == '/' ? $uri : '/'.rtrim($uri, '/');
+        $uri = preg_replace('/\/+/', '/', $uri);
+
+        return $uri;
     }
 
     /**
@@ -44,7 +56,7 @@ class Route {
         try {
             $request = new Requests();
             // get request param
-            $uri = rtrim(parse_url(($request->server->REQUEST_URI))['path'], '/');
+            $uri = self::uriParse(parse_url(($request->server->REQUEST_URI))['path']);
             $method = $request->server->REQUEST_METHOD;
             // 查找路由规则是否存在
             if( ! isset(self::$map_tree[$uri][$method])) {

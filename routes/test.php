@@ -13,3 +13,7 @@ Route::get('/test', function() {
 Route::get('test2/', function() {
     return 'test2';
 });
+
+// Route::group(['prefix' => '/aa'], function() {
+//
+// });
