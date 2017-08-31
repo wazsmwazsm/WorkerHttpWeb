@@ -14,11 +14,19 @@ Class Response {
     /**
      * create http response header.
      *
-     * @param  string  $str
+     * @param  mixed  $header
      * @return void
      */
-    public static function header($str) {
-        Http::header($str);
+    public static function header($headers) {
+        if( ! is_array($headers)) {
+            // if pass array
+            foreach ($headers as $header) {
+                Http::header($header);
+            }
+            return;
+        }
+        // pass string
+        Http::header($headers);
     }
 
     /**
@@ -36,6 +44,7 @@ Class Response {
         // set http response header
         self::header("HTTP/1.1 ".$code." ".$msg);
         $html = '<html><head><title>'.$code.' '.$msg.'</title></head><body><center><h3>'.$msg.'</h3></center></body></html>';
+        
         return $html;
     }
 

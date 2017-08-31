@@ -45,9 +45,12 @@ Class Requests {
      * @param Array $request
      */
     public function __construct(Array $request) {
+        $this->get     = (object) $request['get'];
+        $this->post    = (object) $request['post'];
         $this->requset = (object) array_merge($request['get'], $request['post']);
         $this->server  = (object) $request['server'];
         $this->cookie  = (object) $request['cookie'];
+        $this->files   = (object) $request['files'];
     }
 
     /**
