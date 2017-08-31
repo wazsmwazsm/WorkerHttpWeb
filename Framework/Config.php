@@ -40,4 +40,15 @@ class Config {
 
         return self::$config[$file][$conf];
     }
+
+    /**
+     * get root path.
+     *
+     * @return String
+     */
+    public static function getRootPath() {
+
+        return getcwd();
+    }
+
 }
