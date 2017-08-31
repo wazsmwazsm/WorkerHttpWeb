@@ -2,7 +2,6 @@
 namespace Framework;
 use Workerman\Protocols\Http;
 use Framework\Http\Requests;
-use Framework\Http\Response;
 
 /**
  * HTTP router.
@@ -15,7 +14,7 @@ class Route {
      *
      * @var Array
      */
-    public static $map_tree = [];
+    private static $map_tree = [];
 
     /**
      * call method (http methods).
@@ -39,7 +38,7 @@ class Route {
      * @param  string  $uri
      * @return void
      */
-    public static function uriParse($uri) {
+    private static function uriParse($uri) {
         // make uri as /a/b/c mode
         $uri = $uri == '/' ? $uri : '/'.rtrim($uri, '/');
         $uri = preg_replace('/\/+/', '/', $uri);
@@ -50,48 +49,39 @@ class Route {
     /**
      * dispatch route.
      *
-     * @return String
+     * @return mixed
      */
     public static function dispatch(Requests $request) {
-        try {
-            // get request param
-            $uri = self::uriParse(parse_url(($request->server->REQUEST_URI))['path']);
-            $method = $request->server->REQUEST_METHOD;
-            // 查找路由规则是否存在
-            if( ! isset(self::$map_tree[$uri][$method])) {
-                throw new \LogicException("uri: $uri <==> method $method route rule is not set!\n");
-            }
-            // get callback info
-            $callback = self::$map_tree[$uri][$method];
+        // get request param
+        $uri = self::uriParse(parse_url(($request->server->REQUEST_URI))['path']);
+        $method = $request->server->REQUEST_METHOD;
+        // 查找路由规则是否存在
+        if( ! isset(self::$map_tree[$uri][$method])) {
+            throw new \LogicException("uri: $uri <==> method $method route rule is not set!\n");
+        }
+        // get callback info
+        $callback = self::$map_tree[$uri][$method];
 
-            // is class
-            if(is_string($callback)) {
-                // syntax check
-                if( ! preg_match('/^[a-zA-Z_\\]\w+@[a-zA-Z_]\w+/', $callback)) {
-                    throw new \LogicException("Please use ' controller@method ' define callback\n");
-                }
-                // get controller method info
-                $controller = explode('@', $callback);
-                list($class, $method) = [$controller[0], $controller[1]];
-                // class methods exist ?
-                if( ! class_exists($class) || ! method_exists($class, $method)) {
-                    throw new \BadMethodCallException("Class@method: ".$callback." is not found!\n");
-                }
-                // call method
-                return call_user_func([(new $class), $method], $request);
+        // is class
+        if(is_string($callback)) {
+            // syntax check
+            if( ! preg_match('/^[a-zA-Z_\\]\w+@[a-zA-Z_]\w+/', $callback)) {
+                throw new \LogicException("Please use ' controller@method ' define callback\n");
             }
-            // is callback
-            if(is_callable($callback)) {
-                // call function
-                return call_user_func($callback, $request);
+            // get controller method info
+            $controller = explode('@', $callback);
+            list($class, $method) = [$controller[0], $controller[1]];
+            // class methods exist ?
+            if( ! class_exists($class) || ! method_exists($class, $method)) {
+                throw new \BadMethodCallException("Class@method: ".$callback." is not found!\n");
             }
-
-        } catch (\LogicException $e) {
-            echo $e->getMessage();
-            return Response::abort(404, "Route not found!");
-        } catch (\BadMethodCallException $e) {
-            echo $e->getMessage();
-            return Response::abort(500, "Route error: ".$callback." is not found!");
+            // call method
+            return call_user_func([(new $class), $method], $request);
+        }
+        // is callback
+        if(is_callable($callback)) {
+            // call function
+            return call_user_func($callback, $request);
         }
     }
 }

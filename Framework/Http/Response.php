@@ -7,6 +7,8 @@ use Framework\Config;
 /**
  * HTTP response.
  *
+ * build content\header to HTTP ptotocol
+ *
  * @author MirQin https://github.com/wazsmwazsm
  */
 Class Response {
@@ -18,7 +20,8 @@ Class Response {
      * @return void
      */
     public static function header($headers) {
-        if( ! is_array($headers)) {
+
+        if(is_array($headers)) {
             // if pass array
             foreach ($headers as $header) {
                 Http::header($header);
@@ -30,22 +33,67 @@ Class Response {
     }
 
     /**
-     * create http response.
+     * build response data.
      *
-     * @param  int  $code
-     * @param  string  $info
+     * @param  mixed  $data
+     * @return String
+     */
+    public static function bulid($data) {
+        // should be json
+        if(is_array($data) || is_object($data)) {
+            Http::header("Content-Type: application/json;charset=utf-8");
+            return self::compress(json_encode($data));
+        }
+        // is string (could be html string)
+        if(is_string($data)) {
+            return self::compress($data);
+        }
+        // if return others, regard as illegal
+        throw new \InvalidArgumentException("Controller return illegal data type!\n");
+    }
+
+    /**
+     * compress data.
+     *
+     * @param  string  $data
      * @return string
      */
-    public static function abort($code, $info = NULL) {
-        // if param $info not set or not debug
-        if(($msg = $info) === NULL || ! Config::get('app.debug')) {
-            $msg = array_key_exists($code, HttpCache::$codes) ? HttpCache::$codes[$code] : "there's something wrong";
+    public static function compress($data) {
+
+        $compress_data = $data;
+        // get accept encodeing from request
+        $accept_encodeing = explode(',', $_SERVER['HTTP_ACCEPT_ENCODING']);
+        // get compress config
+        $compress_conf = Config::get('app.compress');
+        // get response headers Content-Type
+        $content_type = isset(HttpCache::$header['Content-Type']) ?
+                        HttpCache::$header['Content-Type'] : "Content-Type: text/html;charset=utf-8";
+
+        foreach ($accept_encodeing as $key => $value) {
+            $accept_encodeing[$key] = trim($value);
         }
-        // set http response header
-        self::header("HTTP/1.1 ".$code." ".$msg);
-        $html = '<html><head><title>'.$code.' '.$msg.'</title></head><body><center><h3>'.$msg.'</h3></center></body></html>';
-        
-        return $html;
+
+        // is compress conf be accepted?
+        if(in_array($compress_conf['encoding'], $accept_encodeing)) {
+            // get content type string
+            preg_match('/^Content-Type\:\s*(.+)\s*\;/', $content_type, $match);
+            // is content type enable compress ?
+            if(in_array($match[1], $compress_conf['content_type'])) {
+                // check conf encodeing, enable compress
+                switch ($compress_conf['encoding']) {
+                    case 'gzip':
+                        Http::header("Content-Encoding: gzip");
+                        $compress_data = gzencode($data, $compress_conf['level']);
+                        break;
+                    case 'deflate':
+                        Http::header("Content-Encoding: deflate");
+                        $compress_data = gzdeflate($data, $compress_conf['level']);
+                        break;
+                }
+            }
+        }
+
+        return $compress_data;
     }
 
 }
