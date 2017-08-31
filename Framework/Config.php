@@ -16,6 +16,18 @@ class Config {
     public static $config = [];
 
     /**
+     * set config.
+     *
+     * @param  string  $file
+     * @param  string  $conf
+     * @return void
+     */
+    public static function set($file, $conf) {
+
+        self::$config[$file] = $conf;
+    }
+
+    /**
      * get config.
      *
      * @param  string  $key
