@@ -14,6 +14,15 @@ class Route {
      * @var Array
      */
     private static $_map_tree = [];
+    /**
+     * route config filter.
+     *
+     * @var Array
+     */
+    private static $_filter = [
+        'prefix'    => '',
+        'namespace' => '',
+    ];
 
     /**
      * call method (http methods).
@@ -24,12 +33,40 @@ class Route {
      * @throws \LogicException run out of worker container, not catch, just crash
      */
     public static function __callstatic($method, $params) {
+        // $param check
         if(count($params) !== 2) {
             // not catch, trigger Fatal error
             throw new \LogicException("method $method accept 2 params!");
         }
         // create map tree, exp: $_map_tree['/a/b']['get'] = 'controller@method'
-        self::$_map_tree[self::_uriParse($params[0])][strtoupper($method)] = $params[1];
+        $uri      = self::_uriParse(self::$_filter['prefix'].$params[0]);
+        $callback = is_string($params[1]) ?
+                    self::_namespaceParse(self::$_filter['namespace'].$params[1]) : $params[1];
+
+        self::$_map_tree[$uri][strtoupper($method)] = $callback;
+    }
+
+    /**
+     * set group route.
+     *
+     * @param  Array    $filter
+     * @param  \Closure  $routes
+     * @return void
+     */
+    public static function group(Array $filter, \Closure $routes) {
+        // set filter uri prefix
+        if(isset($filter['prefix'])) {
+            self::$_filter['prefix'] = $filter['prefix'].'/';
+        }
+        // set filter namespace prefix
+        if(isset($filter['namespace'])) {
+            self::$_filter['namespace'] = '\\'.$filter['namespace'].'\\';
+        }
+        // call route setting
+        call_user_func($routes);
+        // out the scope of the group method, empty filter
+        self::$_filter['prefix'] = '';
+        self::$_filter['namespace'] = '';
     }
 
     /**
@@ -44,6 +81,18 @@ class Route {
         $uri = preg_replace('/\/+/', '/', $uri);
 
         return $uri;
+    }
+
+    /**
+     * Parse namespace.
+     *
+     * @param  String  $namespace
+     * @return String
+     */
+    private static function _namespaceParse($namespace) {
+        // make namespace as \a\b\c mode
+        // why 4 '\' ? see php document preg_replace
+        return preg_replace('/\\\\+/', '\\\\', $namespace);
     }
 
     /**
@@ -67,8 +116,8 @@ class Route {
         // is class
         if(is_string($callback)) {
             // syntax check
-            if( ! preg_match('/^[a-zA-Z_\\]\w+@[a-zA-Z_]\w+/', $callback)) {
-                throw new \LogicException("Please use ' controller@method ' define callback");
+            if( ! preg_match('/^[a-zA-Z0-9_\\\\]+@[a-zA-Z0-9_]+$/', $callback)) {
+                throw new \LogicException("Please use controller@method define callback");
             }
             // get controller method info
             $controller = explode('@', $callback);
