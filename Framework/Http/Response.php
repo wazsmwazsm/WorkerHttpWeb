@@ -33,6 +33,17 @@ Class Response {
     }
 
     /**
+     * get http response status.
+     *
+     * @param  int  $code
+     * @return String
+     */
+    public static function getHttpStatus($code) {
+
+        return HttpCache::$codes[$code];
+    }
+
+    /**
      * build response data.
      *
      * @param  mixed  $data
@@ -42,14 +53,14 @@ Class Response {
         // should be json
         if(is_array($data) || is_object($data)) {
             Http::header("Content-Type: application/json;charset=utf-8");
-            return self::compress(json_encode($data));
+            return self::_compress(json_encode($data));
         }
         // is string (could be html string)
         if(is_string($data)) {
-            return self::compress($data);
+            return self::_compress($data);
         }
         // if return others, regard as illegal
-        throw new \InvalidArgumentException("Controller return illegal data type!\n");
+        throw new \InvalidArgumentException("Controller return illegal data type!");
     }
 
     /**
@@ -58,7 +69,7 @@ Class Response {
      * @param  string  $data
      * @return string
      */
-    public static function compress($data) {
+    private static function _compress($data) {
 
         $compress_data = $data;
         // get accept encodeing from request

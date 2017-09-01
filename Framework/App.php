@@ -29,17 +29,17 @@ class App {
       } catch (\LogicException $e) {
           Error::printError($e);
           Response::header("HTTP/1.1 404 Not Found");
-          $con->close(Error::errorHtml($e));
+          $con->close(Error::errorHtml($e, 404));
 
       } catch (\BadMethodCallException $e) {
           Error::printError($e);
           Response::header("HTTP/1.1 500 Internal Server Error");
-          $con->close(Error::errorHtml($e));
+          $con->close(Error::errorHtml($e, 500));
 
       } catch (\InvalidArgumentException $e) {
           Error::printError($e);
           Response::header("HTTP/1.1 500 Internal Server Error");
-          $con->close(Error::errorHtml($e));
+          $con->close(Error::errorHtml($e, 500));
       }
 
     }

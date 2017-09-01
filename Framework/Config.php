@@ -13,7 +13,7 @@ class Config {
      *
      * @var Array
      */
-    public static $config = [];
+    private static $_config = [];
 
     /**
      * set config.
@@ -24,7 +24,7 @@ class Config {
      */
     public static function set($file, $conf) {
 
-        self::$config[$file] = $conf;
+        self::$_config[$file] = $conf;
     }
 
     /**
@@ -38,7 +38,7 @@ class Config {
         $path = explode('.', $key);
         list($file, $conf) = [$path[0], $path[1]];
 
-        return self::$config[$file][$conf];
+        return self::$_config[$file][$conf];
     }
 
     /**

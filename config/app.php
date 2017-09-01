@@ -2,7 +2,7 @@
 
 return [
 
-    'debug' => FALSE,
+    'debug' => TRUE,
 
     'timezone' => 'UTC',
 
