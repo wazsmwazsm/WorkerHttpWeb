@@ -56,7 +56,7 @@ class Route {
     public static function group(Array $filter, \Closure $routes) {
         // set filter uri prefix
         if(isset($filter['prefix'])) {
-            self::$_filter['prefix'] = $filter['prefix'].'/';
+            self::$_filter['prefix'] = '/'.$filter['prefix'].'/';
         }
         // set filter namespace prefix
         if(isset($filter['namespace'])) {
