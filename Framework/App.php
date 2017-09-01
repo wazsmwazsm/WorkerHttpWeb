@@ -5,7 +5,7 @@ use Framework\Http\Requests;
 use Framework\Http\Response;
 use Framework\Route;
 use Framework\Error;
-
+use Framework\DB\DB;
 /**
  * App.
  *
@@ -24,6 +24,9 @@ class App {
      */
     public static function run(TcpConnection $con, $data) {
         try {
+            // init database
+            DB::init();
+
             // dispatch route, return Response data
             $response = Response::bulid(Route::dispatch(new Requests($data)));
 
