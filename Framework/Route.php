@@ -21,6 +21,7 @@ class Route {
      * @param  string  $method
      * @param  mixed  $params
      * @return void
+     * @throws \LogicException run out of worker container, not catch, just crash
      */
     public static function __callstatic($method, $params) {
         if(count($params) !== 2) {
@@ -34,8 +35,8 @@ class Route {
     /**
      * Parse uri.
      *
-     * @param  string  $uri
-     * @return void
+     * @param  String  $uri
+     * @return String
      */
     private static function _uriParse($uri) {
         // make uri as /a/b/c mode
@@ -49,6 +50,8 @@ class Route {
      * dispatch route.
      *
      * @return mixed
+     * @throws \LogicException
+     * @throws \BadMethodCallException
      */
     public static function dispatch(Requests $request) {
         // get request param

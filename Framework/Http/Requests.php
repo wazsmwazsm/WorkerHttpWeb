@@ -7,7 +7,18 @@ namespace Framework\Http;
  * @author MirQin https://github.com/wazsmwazsm
  */
 Class Requests {
-
+    /**
+     * get param.
+     *
+     * @var Array
+     */
+    public $get;
+    /**
+     * post param.
+     *
+     * @var Array
+     */
+    public $post;
     /**
      * request param.
      *
@@ -26,12 +37,6 @@ Class Requests {
      * @var Array
      */
     public $cookie;
-    /**
-     * session info.
-     *
-     * @var Array
-     */
-    public $session;
     /**
      * upload file info.
      *

@@ -48,6 +48,7 @@ Class Response {
      *
      * @param  mixed  $data
      * @return String
+     * @throws \InvalidArgumentException
      */
     public static function bulid($data) {
         // should be json

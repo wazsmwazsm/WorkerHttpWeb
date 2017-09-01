@@ -30,8 +30,8 @@ class Config {
     /**
      * get config.
      *
-     * @param  string  $key
-     * @return void
+     * @param  String  $key
+     * @return mixed
      */
     public static function get($key) {
 

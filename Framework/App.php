@@ -18,6 +18,9 @@ class App {
      * @param  Workerman\Connection\TcpConnection $con
      * @param  mixed  $data
      * @return void
+     * @throws \LogicException
+     * @throws \BadMethodCallException
+     * @throws \InvalidArgumentException
      */
     public static function run(TcpConnection $con, $data) {
       try {
