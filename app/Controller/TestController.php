@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 use Framework\Controller;
+use Framework\DB\DB;
 
 class TestController extends Controller {
     public function test($request) {
-        return $request->requset;
+        $rst = DB::$connection['con1']->query('select * from ad_promote_info');
+        return $rst;
     }
 }

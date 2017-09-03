@@ -8,11 +8,22 @@ use Framework\DB\Mysql;
  * @author MirQin https://github.com/wazsmwazsm
  */
 class DB {
-
+    /**
+     * connections.
+     *
+     * @var Array
+     */
     public static $connection = [];
 
+    /**
+     * init db connections.
+     *
+     * @return void
+     */
     public static function init() {
+        // get db config
         $db_confs = Config::get('database.connection');
+        // connect database
         foreach ($db_confs as $con_name => $db_conf) {
             switch (strtolower($db_conf['driver'])) {
               case 'mysql':

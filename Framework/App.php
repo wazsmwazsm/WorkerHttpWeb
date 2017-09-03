@@ -24,9 +24,6 @@ class App {
      */
     public static function run(TcpConnection $con, $data) {
         try {
-            // init database
-            DB::init();
-
             // dispatch route, return Response data
             $response = Response::bulid(Route::dispatch(new Requests($data)));
 
@@ -49,4 +46,15 @@ class App {
         }
 
     }
+    
+    /**
+     * init db connections.
+     *
+     * @return void
+     */
+    public static function dbInit() {
+        // init database
+        DB::init();
+    }
+
 }
