@@ -1,7 +1,7 @@
 <?php
 namespace Framework;
 use Framework\Http\Requests;
-
+use Closure;
 /**
  * HTTP router.
  *
@@ -53,7 +53,7 @@ class Route {
      * @param  \Closure  $routes
      * @return void
      */
-    public static function group(Array $filter, \Closure $routes) {
+    public static function group(Array $filter, Closure $routes) {
         // set filter uri prefix
         if(isset($filter['prefix'])) {
             self::$_filter['prefix'] = '/'.$filter['prefix'].'/';
