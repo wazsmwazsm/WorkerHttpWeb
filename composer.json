@@ -1,7 +1,9 @@
 {
     "require": {
         "workerman/workerman": "^3.4",
-        "workerman/mysql": "1.0.*"
+        "workerman/mysql": "1.0.*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*"
     },
     "autoload": {
         "psr-4": {
