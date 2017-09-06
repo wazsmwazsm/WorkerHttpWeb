@@ -1,7 +1,7 @@
 <?php
 namespace Framework\DB;
 use Framework\Config;
-use Framework\DB\Mysql;
+use Framework\DB\Drivers\Mysql;
 /**
  * DB.
  *

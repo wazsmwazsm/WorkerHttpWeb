@@ -21,7 +21,7 @@ class Mysql implements ConnectorInterface {
             'port'     => $port,
             'user'     => $user,
             'password' => $password,
-            'dbname'   => $db_name,
+            'dbname'   => $dbname,
             'charset'  => $charset,
         ];
         $this->_connect();
@@ -36,12 +36,12 @@ class Mysql implements ConnectorInterface {
             $dsn,
             $this->_config["user"],
             $this->_config["password"],
-            [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset'])]
+            [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset']]
         );
         // 错误时抛出异常
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         // 不使用 php 本地函数进行预处理，使用数据库的预处理
-        $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
     }
 
     public function table($table) {
@@ -57,7 +57,7 @@ class Mysql implements ConnectorInterface {
     }
 
     public function query($sql) {
-        return $this->pdo->query($sql);
+        return $this->_pdo->query($sql);
     }
 
     public function get() {
