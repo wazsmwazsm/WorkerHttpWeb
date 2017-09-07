@@ -1,6 +1,7 @@
 <?php
 namespace Framework\DB\Drivers;
 use PDO;
+use PDOException;
 /**
  * Mysql, $ use https://github.com/walkor/mysql.
  *
@@ -32,16 +33,20 @@ class Mysql implements ConnectorInterface {
                ';host='.$this->_config["host"].
                ';port='.$this->_config['port'];
 
-        $this->_pdo = new PDO(
-            $dsn,
-            $this->_config["user"],
-            $this->_config["password"],
-            [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset']]
-        );
-        // 错误时抛出异常
-        $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        // 不使用 php 本地函数进行预处理，使用数据库的预处理
-        $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        try {
+            $this->_pdo = new PDO(
+                $dsn,
+                $this->_config["user"],
+                $this->_config["password"],
+                [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset']]
+            );
+            // 错误时抛出异常
+            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            // 不使用 php 本地函数进行预处理，使用数据库的预处理
+            $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        } catch (PDOException $e) {
+            echo 'Connection failed: ' . $e->getMessage();
+        }
     }
 
     public function table($table) {
