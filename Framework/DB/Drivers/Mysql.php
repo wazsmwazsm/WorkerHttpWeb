@@ -45,7 +45,7 @@ class Mysql implements ConnectorInterface {
             // 不使用 php 本地函数进行预处理，使用数据库的预处理
             $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
         } catch (PDOException $e) {
-            echo 'Connection failed: ' . $e->getMessage();
+            throw new PDOException($e->getMessage());
         }
     }
 
