@@ -23,6 +23,7 @@ class Mysql implements ConnectorInterface {
 
     private $_cols_str = ' * ';
     private $_where_str;
+    private $_orderby_str;
 
     private $_bind_params;
 
@@ -71,11 +72,13 @@ class Mysql implements ConnectorInterface {
         $this->_query_sql = '';
         $this->_cols_str = ' * ';
         $this->_where_str = '';
+        $this->_orderby_str = '';
         $this->_bind_params = [];
     }
 
     private function _buildQuery() {
-        $this->_query_sql = 'SELECT '.$this->_cols_str.' FROM '.$this->_table.$this->_where_str;
+        $this->_query_sql = 'SELECT '.$this->_cols_str.' FROM '.$this->_table.
+            $this->_where_str.$this->_orderby_str;
     }
 
     private function _bindParams() {
@@ -107,7 +110,7 @@ class Mysql implements ConnectorInterface {
 
     public function get() {
         $this->_buildQuery();
-        var_dump($this->_query_sql,$this->_bind_params);
+        
         $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
         $this->_bindParams();
 
@@ -194,7 +197,14 @@ class Mysql implements ConnectorInterface {
 
     }
 
-    public function orderBy() {
+    public function orderBy($field, $mode) {
+        // is the first time call orderBy method ?
+        if($this->_orderby_str == '') {
+            $this->_orderby_str = ' ORDER BY '.$field.' '.$mode;
+        } else {
+            $this->_orderby_str .= ' , '.$field.' '.$mode;
+        }
 
+        return $this;
     }
 }
