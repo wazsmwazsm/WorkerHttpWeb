@@ -9,10 +9,10 @@ class TestController extends Controller {
     public function test($request) {
         // $rst = DB::$connection['con1']->query('select * from ad_promote_info limit 0, 30');
 
-        $rst = DB::$connection['con2']->table('material_audio_new_info')
-             ->select('group as gp', 'count(*) as gp_count')
-             ->groupBy('group')
-             ->having('count(*)','>', 13)
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+             ->leftJoin('ad_promote_oss', 'ad_promote_oss.adId', 'ad_promote_collect.adId')
+             ->select('ad_promote_oss.adId')
+             ->where('ad_promote_collect.date', 1500912000)
              ->get();
         return $rst;
     }

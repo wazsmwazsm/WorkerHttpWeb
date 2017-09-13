@@ -26,6 +26,8 @@ class Mysql implements ConnectorInterface {
     private $_orderby_str = '';
     private $_groupby_str = '';
     private $_having_str = '';
+    private $_join_str = '';
+
     private $_bind_params = [];
 
     public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8') {
@@ -63,7 +65,7 @@ class Mysql implements ConnectorInterface {
 
 
     public function table($table) {
-        $this->_table = $table;
+        $this->_table = self::_backquote($table);
         return $this;
     }
 
@@ -76,12 +78,16 @@ class Mysql implements ConnectorInterface {
         $this->_orderby_str = '';
         $this->_groupby_str = '';
         $this->_having_str = '';
+        $this->_join_str = '';
         $this->_bind_params = [];
     }
 
     private function _buildQuery() {
-        $this->_query_sql = 'SELECT '.$this->_cols_str.' FROM '.$this->_table.
-            $this->_where_str.$this->_groupby_str.$this->_orderby_str.$this->_having_str;
+        $this->_query_sql = 'SELECT '.$this->_cols_str.' '.' FROM '.$this->_table.
+            $this->_join_str.
+            $this->_where_str.
+            $this->_groupby_str.$this->_having_str.
+            $this->_orderby_str;
     }
 
     private function _bindParams() {
@@ -94,12 +100,23 @@ class Mysql implements ConnectorInterface {
 
     private static function _backquote($str) {
         // match pattern
-        $alias_pattern = '/([a-zA-Z0-9_]+)\s+(AS|as|As)\s+([a-zA-Z0-9_]+)/';
-        $alias_replace = '`$1` AS `$3`';
+        $alias_pattern = '/([a-zA-Z0-9_\.]+)\s+(AS|as|As)\s+([a-zA-Z0-9_]+)/';
+        $alias_replace = '`$1` $2 `$3`';
+        $prefix_pattern = '/([a-zA-Z0-9_]+\s*)(\.)(\s*[a-zA-Z0-9_]+)/';
+        $prefix_replace = '`$1`$2`$3`';
         $func_pattern = '/[a-zA-Z0-9_]+\([a-zA-Z0-9_\,\s\`\'\"\*]*\)/';
         // alias mode
-        if(preg_match($alias_pattern, $str)) {
+        if(preg_match($alias_pattern, $str, $alias_match)) {
+            // if field is aa.bb mode
+            if(preg_match($prefix_pattern, $alias_match[1])) {
+                $pre_rst = preg_replace($prefix_pattern, $prefix_replace, $alias_match[1]);
+                $alias_replace = $pre_rst.' $2 `$3`';
+            }
             return preg_replace($alias_pattern, $alias_replace, $str);
+        }
+        // prefix mode
+        if(preg_match($prefix_pattern, $str)) {
+            return preg_replace($prefix_pattern, $prefix_replace, $str);
         }
         // mysql fun mode
         if(preg_match($func_pattern, $str)) {
@@ -269,6 +286,23 @@ class Mysql implements ConnectorInterface {
         return $this;
     }
 
+    public function join($table, $one, $two, $type = 'INNER') {
+        if( ! in_array($type, ['INNER', 'LEFT', 'RIGHT'])) {
+            throw new PDOException("Error Join mode");
+        }
+        $this->_join_str .= ' '.$type.' JOIN '.self::_backquote($table).
+            ' ON '.self::_backquote($one).' = '.self::_backquote($two);
+        return $this;
+    }
+
+    public function leftJoin($table, $one, $two) {
+        return $this->join($table, $one, $two, 'LEFT');
+    }
+
+    public function rightJoin($table, $one, $two) {
+        return $this->join($table, $one, $two, 'RIGHT');
+    }
+
     public function query($sql) {
         return $this->_pdo->query($sql);
     }
@@ -280,6 +314,8 @@ class Mysql implements ConnectorInterface {
     public function prepare($sql, Array $driver_options = []) {
         return $this->_pdo->prepare($sql, $driver_options);
     }
+
+
 
     public function insert() {
 
