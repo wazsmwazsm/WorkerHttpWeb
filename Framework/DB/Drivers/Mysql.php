@@ -249,7 +249,7 @@ class Mysql implements ConnectorInterface {
     public function whereIn($field, Array $data, $condition = 'IN', $operator = 'AND') {
         // create placeholder
         foreach ($data as $key => $value) {
-            $plh = ':'.bin2hex($field.'_'.$condition.'_'.$value);
+            $plh = ':'.uniqid();
             $data[$key] = $plh;
             $this->_bind_params[$plh] = $value;
         }
