@@ -273,6 +273,14 @@ class Mysql implements ConnectorInterface {
         return $this->_pdo->query($sql);
     }
 
+    public function exec($sql) {
+        return $this->_pdo->exec($sql);
+    }
+
+    public function prepare($sql, Array $driver_options = []) {
+        return $this->_pdo->prepare($sql, $driver_options);
+    }
+
     public function insert() {
 
     }
