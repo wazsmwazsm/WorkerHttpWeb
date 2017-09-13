@@ -3,7 +3,7 @@ namespace Framework\DB\Drivers;
 use PDO;
 use PDOException;
 /**
- * Mysql, $ use https://github.com/walkor/mysql.
+ * Mysql
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
@@ -27,7 +27,6 @@ class Mysql implements ConnectorInterface {
     private $_groupby_str = '';
     private $_having_str = '';
     private $_join_str = '';
-
     private $_bind_params = [];
 
     public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8') {
@@ -90,6 +89,7 @@ class Mysql implements ConnectorInterface {
             $this->_orderby_str;
     }
 
+
     private function _bindParams() {
         if(is_array($this->_bind_params)) {
             foreach ($this->_bind_params as $plh => $param) {
@@ -142,6 +142,18 @@ class Mysql implements ConnectorInterface {
         return $this;
     }
 
+
+    public function debugDumpParams() {
+        $this->_buildQuery();
+
+        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+        $this->_bindParams();
+
+        $this->_reset();
+        $this->_pdoSt->execute();
+
+        return $this->_pdoSt->debugDumpParams();
+    }
 
     public function get() {
         $this->_buildQuery();
@@ -233,6 +245,50 @@ class Mysql implements ConnectorInterface {
 
         return $this;
     }
+
+    public function whereIn($field, Array $data, $condition = 'IN', $operator = 'AND') {
+        // create placeholder
+        foreach ($data as $key => $value) {
+            $plh = ':'.bin2hex($field.'_'.$condition.'_'.$value);
+            $data[$key] = $plh;
+            $this->_bind_params[$plh] = $value;
+        }
+        // is the first time call where method ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE '.self::_backquote($field).' '.$condition.' ('.implode(',', $data).')';
+        } else {
+            $this->_where_str .= ' '.$operator.' '.self::_backquote($field).' '.$condition.' ('.implode(',', $data).')';
+        }
+
+        return $this;
+    }
+
+    public function orWhereIn($field, Array $data) {
+        return $this->whereIn($field, $data, 'IN', 'OR');
+    }
+
+    public function whereNotIn($field, Array $data) {
+        return $this->whereIn($field, $data, 'NOT IN', 'AND');
+    }
+
+    public function orWhereNotIn($field, Array $data) {
+        return $this->whereIn($field, $data, 'NOT IN', 'OR');
+    }
+
+    // public function whereBetween($field, $start, $end, $operator = 'AND') {
+    //     //
+    //     $start_plh = ':'.bin2hex($field.'_'.'Between'.'_'.$start);
+    //     $this->_bind_params[$plh] = $value;
+    //
+    //     // is the first time call where method ?
+    //     if($this->_where_str == '') {
+    //         $this->_where_str = ' WHERE '.self::_backquote($field).' '.$condition.' ('.implode(',', $data).')';
+    //     } else {
+    //         $this->_where_str .= ' '.$operator.' '.self::_backquote($field).' '.$condition.' ('.implode(',', $data).')';
+    //     }
+    //
+    //     return $this;
+    // }
 
     public function groupBy($field) {
         // is the first time call groupBy method ?
