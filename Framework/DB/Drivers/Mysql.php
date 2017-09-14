@@ -212,7 +212,14 @@ class Mysql implements ConnectorInterface {
 
         return $this->row()['min_num'];
     }
-    
+
+    public function avg($field) {
+
+        $this->_cols_str = ' AVG('.self::_backquote($field).') AS avg_num ';
+
+        return $this->row()['avg_num'];
+    }
+
     // 条件构造的统一操作
     private function _condition_constructor($args_num, $params, $operator, &$construct_str) {
 
