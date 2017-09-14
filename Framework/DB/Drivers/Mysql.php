@@ -181,6 +181,17 @@ class Mysql implements ConnectorInterface {
         return $this->_pdoSt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function count($field = '*') {
+
+        if(trim($field) != '*') {
+            $field = self::_backquote($field);
+        }
+
+        $this->_cols_str = ' COUNT('.$field.') AS count_num ';
+
+        return $this->row()['count_num'];
+    }
+
     // 条件构造的统一操作
     private function _condition_constructor($args_num, $params, $operator, &$construct_str) {
 
