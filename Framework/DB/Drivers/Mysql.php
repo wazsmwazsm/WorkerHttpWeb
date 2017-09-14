@@ -319,7 +319,7 @@ class Mysql implements ConnectorInterface {
     }
 
     public function whereBetween($field, $start, $end, $operator = 'AND') {
-        //
+        // create placeholder
         $start_plh = self::getPlh();
         $end_plh = self::getPlh();
         $this->_bind_params[$start_plh] = $start;
@@ -381,6 +381,9 @@ class Mysql implements ConnectorInterface {
     }
 
     public function orderBy($field, $mode = 'ASC') {
+        if( ! in_array($mode, ['ASC', 'DESC'])) {
+            throw new PDOException("Error orderby mode");
+        }
         // is the first time call orderBy method ?
         if($this->_orderby_str == '') {
             $this->_orderby_str = ' ORDER BY '.self::_backquote($field).' '.$mode;
