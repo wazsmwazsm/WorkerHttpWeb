@@ -23,7 +23,7 @@ class TestController extends Controller {
              ->whereBetween('id', 22, 60)
              ->orWhereBetween('id', 90, 100)
              ->orderBy('id', 'DESC')
-             ->sum('id');
+             ->min('id');
         $rst = (string) $rst;
         return $rst;
     }

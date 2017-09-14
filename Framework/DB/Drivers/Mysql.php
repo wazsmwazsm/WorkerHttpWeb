@@ -199,6 +199,20 @@ class Mysql implements ConnectorInterface {
         return $this->row()['sum_num'];
     }
 
+    public function max($field) {
+
+        $this->_cols_str = ' MAX('.self::_backquote($field).') AS max_num ';
+
+        return $this->row()['max_num'];
+    }
+
+    public function min($field) {
+
+        $this->_cols_str = ' MIN('.self::_backquote($field).') AS min_num ';
+
+        return $this->row()['min_num'];
+    }
+    
     // 条件构造的统一操作
     private function _condition_constructor($args_num, $params, $operator, &$construct_str) {
 
