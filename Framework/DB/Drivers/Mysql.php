@@ -157,7 +157,7 @@ class Mysql implements ConnectorInterface {
 
     public function get() {
         $this->_buildQuery();
-        var_dump($this->_query_sql);
+        
         $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
         $this->_bindParams();
 
@@ -191,7 +191,7 @@ class Mysql implements ConnectorInterface {
                   throw new PDOException($params[0].' should be Array');
               }
               foreach ($params[0] as $field => $value) {
-                  $plh = ':'.bin2hex($field.'_'.$value);
+                  $plh = ':'.uniqid();
                   $construct_str .= ' '.self::_backquote($field).' = '.$plh.' '.$operator;
                   $this->_bind_params[$plh] = $value;
               }
@@ -199,7 +199,7 @@ class Mysql implements ConnectorInterface {
               $construct_str = rtrim($construct_str, $operator);
               break;
           case 2:
-              $plh = ':'.bin2hex($params[0].'_'.$params[1]);
+              $plh = ':'.uniqid();
               $construct_str .= ' '.self::_backquote($params[0]).' = '.$plh.' ';
               $this->_bind_params[$plh] = $params[1];
               break;
@@ -207,7 +207,7 @@ class Mysql implements ConnectorInterface {
               if( ! in_array($params[1], ['<', '>', '<=', '>=', '=', '!=', '<>'])) {
                   throw new PDOException('Confusing Symbol '.$params[1]);
               }
-              $plh = ':'.bin2hex($params[0].'_'.$params[1].'_'.$params[2]);
+              $plh = ':'.uniqid();
               $construct_str .= ' '.self::_backquote($params[0]).' '.$params[1].' '.$plh.' ';
               $this->_bind_params[$plh] = $params[2];
               break;

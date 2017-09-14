@@ -15,11 +15,14 @@ class TestController extends Controller {
         //      ->select('ad_promote_oss.adId')
         //      ->where('ad_promote_collect.date', 1500912000)
         //      ->get();
-        $rst = DB::$connection['con1']->table('ad_promote_info')
+        // $rst = DB::$connection['con1']->table('ad_promote_info')
+        //      ->where('id', '<', 10)
+        //      ->orWhereIn('id', [62,22,1,3])
+        //      ->get();
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
              ->where('id', '<', 10)
              ->orWhereIn('id', [62,22,1,3])
              ->get();
-
         return $rst;
     }
 }
