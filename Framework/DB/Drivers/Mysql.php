@@ -192,6 +192,13 @@ class Mysql implements ConnectorInterface {
         return $this->row()['count_num'];
     }
 
+    public function sum($field) {
+
+        $this->_cols_str = ' SUM('.self::_backquote($field).') AS sum_num ';
+
+        return $this->row()['sum_num'];
+    }
+
     // 条件构造的统一操作
     private function _condition_constructor($args_num, $params, $operator, &$construct_str) {
 
