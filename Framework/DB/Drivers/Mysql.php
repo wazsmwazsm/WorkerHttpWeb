@@ -98,6 +98,10 @@ class Mysql implements ConnectorInterface {
         }
     }
 
+    private static function getPlh() {
+        return ':'.uniqid();
+    }
+
     private static function _backquote($str) {
         // match pattern
         $alias_pattern = '/([a-zA-Z0-9_\.]+)\s+(AS|as|As)\s+([a-zA-Z0-9_]+)/';
@@ -157,7 +161,7 @@ class Mysql implements ConnectorInterface {
 
     public function get() {
         $this->_buildQuery();
-        
+
         $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
         $this->_bindParams();
 
@@ -191,7 +195,7 @@ class Mysql implements ConnectorInterface {
                   throw new PDOException($params[0].' should be Array');
               }
               foreach ($params[0] as $field => $value) {
-                  $plh = ':'.uniqid();
+                  $plh = self::getPlh();
                   $construct_str .= ' '.self::_backquote($field).' = '.$plh.' '.$operator;
                   $this->_bind_params[$plh] = $value;
               }
@@ -199,7 +203,7 @@ class Mysql implements ConnectorInterface {
               $construct_str = rtrim($construct_str, $operator);
               break;
           case 2:
-              $plh = ':'.uniqid();
+              $plh = self::getPlh();
               $construct_str .= ' '.self::_backquote($params[0]).' = '.$plh.' ';
               $this->_bind_params[$plh] = $params[1];
               break;
@@ -207,7 +211,7 @@ class Mysql implements ConnectorInterface {
               if( ! in_array($params[1], ['<', '>', '<=', '>=', '=', '!=', '<>'])) {
                   throw new PDOException('Confusing Symbol '.$params[1]);
               }
-              $plh = ':'.uniqid();
+              $plh = self::getPlh();
               $construct_str .= ' '.self::_backquote($params[0]).' '.$params[1].' '.$plh.' ';
               $this->_bind_params[$plh] = $params[2];
               break;
@@ -249,7 +253,7 @@ class Mysql implements ConnectorInterface {
     public function whereIn($field, Array $data, $condition = 'IN', $operator = 'AND') {
         // create placeholder
         foreach ($data as $key => $value) {
-            $plh = ':'.uniqid();
+            $plh = self::getPlh();
             $data[$key] = $plh;
             $this->_bind_params[$plh] = $value;
         }
@@ -275,20 +279,26 @@ class Mysql implements ConnectorInterface {
         return $this->whereIn($field, $data, 'NOT IN', 'OR');
     }
 
-    // public function whereBetween($field, $start, $end, $operator = 'AND') {
-    //     //
-    //     $start_plh = ':'.bin2hex($field.'_'.'Between'.'_'.$start);
-    //     $this->_bind_params[$plh] = $value;
-    //
-    //     // is the first time call where method ?
-    //     if($this->_where_str == '') {
-    //         $this->_where_str = ' WHERE '.self::_backquote($field).' '.$condition.' ('.implode(',', $data).')';
-    //     } else {
-    //         $this->_where_str .= ' '.$operator.' '.self::_backquote($field).' '.$condition.' ('.implode(',', $data).')';
-    //     }
-    //
-    //     return $this;
-    // }
+    public function whereBetween($field, $start, $end, $operator = 'AND') {
+        //
+        $start_plh = self::getPlh();
+        $end_plh = self::getPlh();
+        $this->_bind_params[$start_plh] = $start;
+        $this->_bind_params[$end_plh] = $end;
+
+        // is the first time call where method ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE '.self::_backquote($field).' BETWEEN '.$start_plh.' AND '.$end_plh;
+        } else {
+            $this->_where_str .= ' '.$operator.' '.self::_backquote($field).' BETWEEN '.$start_plh.' AND '.$end_plh;
+        }
+
+        return $this;
+    }
+
+    public function orWhereBetween($field, $start, $end) {
+        return $this->whereBetween($field, $start, $end, 'OR');
+    }
 
     public function groupBy($field) {
         // is the first time call groupBy method ?
@@ -331,7 +341,7 @@ class Mysql implements ConnectorInterface {
         return $this;
     }
 
-    public function orderBy($field, $mode) {
+    public function orderBy($field, $mode = 'ASC') {
         // is the first time call orderBy method ?
         if($this->_orderby_str == '') {
             $this->_orderby_str = ' ORDER BY '.self::_backquote($field).' '.$mode;

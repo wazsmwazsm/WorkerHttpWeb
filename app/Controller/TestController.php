@@ -20,8 +20,9 @@ class TestController extends Controller {
         //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
         $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->where('id', '<', 10)
-             ->orWhereIn('id', [62,22,1,3])
+             ->whereBetween('id', 22, 60)
+             ->orWhereBetween('id', 90, 100)
+             ->orderBy('id', 'DESC')
              ->get();
         return $rst;
     }
