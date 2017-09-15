@@ -2,6 +2,7 @@
 namespace Framework\DB\Drivers;
 use PDO;
 use PDOException;
+use Closure;
 /**
  * Mysql
  *
@@ -161,7 +162,7 @@ class Mysql implements ConnectorInterface {
 
     public function get() {
         $this->_buildQuery();
-
+        var_dump($this->_query_sql);
         $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
         $this->_bindParams();
 
@@ -255,6 +256,29 @@ class Mysql implements ConnectorInterface {
               $this->_bind_params[$plh] = $params[2];
               break;
         }
+    }
+
+    public function brackets(Closure $callback, $operator = 'AND') {
+        // first time call where ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE ( ';
+        } else {
+            $this->_where_str .= ' '.$operator.' ( ';
+        }
+        // save tmp
+        $where = $this->_where_str;
+        $this->_where_str = '';
+
+        call_user_func($callback, $this);
+        // recreate where string
+        $this->_where_str = preg_replace('/WHERE/', '', $this->_where_str, 1);
+        $this->_where_str = $where.$this->_where_str.' ) ';
+
+        return $this;
+    }
+
+    public function orBrackets(Closure $callback) {
+        return $this->brackets($callback, 'OR');
     }
 
     public function where() {
@@ -381,9 +405,6 @@ class Mysql implements ConnectorInterface {
     }
 
     public function orderBy($field, $mode = 'ASC') {
-        if( ! in_array($mode, ['ASC', 'DESC'])) {
-            throw new PDOException("Error orderby mode");
-        }
         // is the first time call orderBy method ?
         if($this->_orderby_str == '') {
             $this->_orderby_str = ' ORDER BY '.self::_backquote($field).' '.$mode;
@@ -395,9 +416,7 @@ class Mysql implements ConnectorInterface {
     }
 
     public function join($table, $one, $two, $type = 'INNER') {
-        if( ! in_array($type, ['INNER', 'LEFT', 'RIGHT'])) {
-            throw new PDOException("Error Join mode");
-        }
+        // create join string
         $this->_join_str .= ' '.$type.' JOIN '.self::_backquote($table).
             ' ON '.self::_backquote($one).' = '.self::_backquote($two);
         return $this;

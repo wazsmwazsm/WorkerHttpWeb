@@ -19,12 +19,17 @@ class TestController extends Controller {
         //      ->where('id', '<', 10)
         //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
+
         $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->whereBetween('id', 22, 60)
-             ->orWhereBetween('id', 90, 100)
+             ->where('id', '<', 10)
+             ->orBrackets(function($query) {
+                $query->where('adId', '001-001')
+                      ->orWhere('adId', '001-003');
+             })
              ->orderBy('id', 'DESC')
-             ->avg('id');
-        $rst = (string) $rst;
+             ->get();
+
+        // $rst = (string) $rst;
         return $rst;
     }
 }
