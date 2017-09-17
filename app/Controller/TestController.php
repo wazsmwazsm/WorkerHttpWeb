@@ -20,15 +20,16 @@ class TestController extends Controller {
         //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
 
-        $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->where('id', '<', 10)
-             ->orBrackets(function($query) {
-                $query->where('adId', '001-001')
-                      ->orWhere('adId', '001-003');
-             })
-             ->orderBy('id', 'DESC')
-             ->get();
-
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        //      ->where('id', '<', 10)
+        //      ->orBrackets(function($query) {
+        //         $query->where('adId', '001-001')
+        //               ->orWhere('adId', '001-003');
+        //      })
+        //      ->orderBy('id', 'DESC')
+        //      ->get();
+        $rst = DB::$connection['con1']->table('ad_promote_info')
+              ->list('id');
         // $rst = (string) $rst;
         return $rst;
     }

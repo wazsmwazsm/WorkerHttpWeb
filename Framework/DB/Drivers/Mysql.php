@@ -182,6 +182,11 @@ class Mysql implements ConnectorInterface {
         return $this->_pdoSt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function list($field) {
+        $this->_cols_str = ' `'.$field.'` AS col_list ';
+        return array_column($this->get(), 'col_list');
+    }
+
     public function count($field = '*') {
 
         if(trim($field) != '*') {
