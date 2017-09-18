@@ -28,9 +28,16 @@ class TestController extends Controller {
         //      })
         //      ->orderBy('id', 'DESC')
         //      ->get();
-        $rst = DB::$connection['con1']->table('ad_promote_info')
-              ->list('id');
+
+        // $rst = DB::$connection['con1']->table('ad_promote_info')
+        //       ->list('id');
         // $rst = (string) $rst;
+
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+             ->whereNull('adStyle')
+             ->get();
+
+
         return $rst;
     }
 }

@@ -190,7 +190,7 @@ class Mysql implements ConnectorInterface {
     public function count($field = '*') {
 
         if(trim($field) != '*') {
-            $field = self::_backquote($field);
+            $field = '`'.$field.'`';
         }
 
         $this->_cols_str = ' COUNT('.$field.') AS count_num ';
@@ -200,28 +200,28 @@ class Mysql implements ConnectorInterface {
 
     public function sum($field) {
 
-        $this->_cols_str = ' SUM('.self::_backquote($field).') AS sum_num ';
+        $this->_cols_str = ' SUM(`'.$field.'`) AS sum_num ';
 
         return $this->row()['sum_num'];
     }
 
     public function max($field) {
 
-        $this->_cols_str = ' MAX('.self::_backquote($field).') AS max_num ';
+        $this->_cols_str = ' MAX(`'.$field.'`) AS max_num ';
 
         return $this->row()['max_num'];
     }
 
     public function min($field) {
 
-        $this->_cols_str = ' MIN('.self::_backquote($field).') AS min_num ';
+        $this->_cols_str = ' MIN(`'.$field.'`) AS min_num ';
 
         return $this->row()['min_num'];
     }
 
     public function avg($field) {
 
-        $this->_cols_str = ' AVG('.self::_backquote($field).') AS avg_num ';
+        $this->_cols_str = ' AVG(`'.$field.'`) AS avg_num ';
 
         return $this->row()['avg_num'];
     }
@@ -366,6 +366,31 @@ class Mysql implements ConnectorInterface {
 
     public function orWhereBetween($field, $start, $end) {
         return $this->whereBetween($field, $start, $end, 'OR');
+    }
+
+    public function whereNull($field, $condition = 'NULL', $operator = 'AND') {
+        // is the first time call where method ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE ';
+        } else {
+            $this->_where_str .= ' '.$operator.' ';
+        }
+
+        $this->_where_str .= self::_backquote($field).' IS '.$condition.' ';
+
+        return $this;
+    }
+
+    public function whereNotNull($field) {
+        return $this->whereNull($field, 'NOT NULL', 'AND');
+    }
+
+    public function orWhereNull($field) {
+        return $this->whereNull($field, 'NULL', 'OR');
+    }
+
+    public function orWhereNotNull($field) {
+        return $this->whereNull($field, 'NOT NULL', 'OR');
     }
 
     public function groupBy($field) {
