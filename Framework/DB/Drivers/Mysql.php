@@ -19,6 +19,18 @@ class Mysql implements ConnectorInterface {
     private $_pdoSt = NULL;
     private $_config = [];
 
+    private $_buildAttrs = [
+      '_table',
+      '_query_sql',
+      '_cols_str',
+      '_where_str',
+      '_orderby_str',
+      '_groupby_str',
+      '_having_str',
+      '_join_str',
+      '_limit_str',
+    ];
+
     private $_table = '';
     private $_query_sql = '';
 
@@ -177,7 +189,7 @@ class Mysql implements ConnectorInterface {
 
     public function get() {
         $this->_buildQuery();
-        // var_dump($this->_query_sql);
+        var_dump($this->_query_sql);
         $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
         $this->_bindParams();
 
@@ -278,26 +290,34 @@ class Mysql implements ConnectorInterface {
         }
     }
 
-    private function subBuilder(Closure $callback) {
-
+    private function _storeAttr() {
         // attribute need to store
-        $filters = [
-          '_table',
-          '_query_sql',
-          '_cols_str',
-          '_where_str',
-          '_orderby_str',
-          '_groupby_str',
-          '_having_str',
-          '_join_str',
-          '_limit_str',
-        ];
-
-        $stage = [];
+        $store = [];
         // store attr
-        foreach ($filters as $filter) {
-            $stage[ltrim($filter, '_')] = $this->$filter;
+        foreach ($this->_buildAttrs as $buildAttr) {
+            $store[ltrim($buildAttr, '_')] = $this->$buildAttr;
         }
+
+        return $store;
+    }
+
+    private function _reStoreAttr(Array $data) {
+        foreach ($this->_buildAttrs as $buildAttr) {
+            $this->$buildAttr = $data[ltrim($buildAttr, '_')];
+        }
+    }
+
+    private function _storeBindParam() {
+        return $this->_bind_params;
+    }
+
+    private function _reStoreBindParam($bind_params) {
+        $this->_bind_params = $bind_params;
+    }
+
+    private function _subBuilder(Closure $callback) {
+        // store build attr
+        $store = $this->_storeAttr();
 
         /**************** begin sub query build ****************/
             // empty attribute
@@ -309,15 +329,13 @@ class Mysql implements ConnectorInterface {
 
             $this->_buildQuery();
 
-            foreach ($filters as $filter) {
-                $sub_attr[ltrim($filter, '_')] = $this->$filter;
+            foreach ($this->_buildAttrs as $buildAttr) {
+                $sub_attr[ltrim($buildAttr, '_')] = $this->$buildAttr;
             }
         /**************** end sub query build ****************/
 
         // restore attribute
-        foreach ($filters as $filter) {
-            $this->$filter = $stage[ltrim($filter, '_')];
-        }
+        $this->_reStoreAttr($store);
 
         return $sub_attr;
     }
@@ -436,7 +454,7 @@ class Mysql implements ConnectorInterface {
         } else {
             $this->_where_str .= ' '.$operator.' ( ';
         }
-        $sub_attr = $this->subBuilder($callback);
+        $sub_attr = $this->_subBuilder($callback);
 
         $this->_where_str .= preg_replace('/WHERE/', '', $sub_attr['where_str'], 1).' ) ';
 
@@ -455,7 +473,7 @@ class Mysql implements ConnectorInterface {
             $this->_where_str .= ' '.$operator.' '.$condition.' ( ';
         }
 
-        $sub_attr = $this->subBuilder($callback);
+        $sub_attr = $this->_subBuilder($callback);
         $this->_where_str .= $sub_attr['query_sql'].' ) ';
 
         return $this;
@@ -480,7 +498,7 @@ class Mysql implements ConnectorInterface {
             $this->_where_str .= ' '.$operator.' '.self::_backquote($field).' '.$condition.' ( ';
         }
 
-        $sub_attr = $this->subBuilder($callback);
+        $sub_attr = $this->_subBuilder($callback);
         $this->_where_str .= $sub_attr['query_sql'].' ) ';
 
         return $this;
@@ -499,7 +517,7 @@ class Mysql implements ConnectorInterface {
     }
 
     public function fromSub(Closure $callback) {
-        $sub_attr = $this->subBuilder($callback);
+        $sub_attr = $this->_subBuilder($callback);
         $this->_table .= ' ( '.$sub_attr['query_sql'].' ) AS tb_'.uniqid().' ';
         return $this;
     }
@@ -509,6 +527,31 @@ class Mysql implements ConnectorInterface {
         return $this;
     }
 
+    public function paginate($step, $page = NULL) {
+        // store build attr\bind param
+        $store = $this->_storeAttr();
+        $bind_params = $this->_storeBindParam();
+        // get count
+        $count = $this->count();
+        // restore build attr\bind param
+        $this->_reStoreAttr($store);
+        $this->_reStoreBindParam($bind_params);
+
+        $page = $page ? $page : 1;
+
+        $this->limit($step * ($page - 1), $step);
+
+        $rst['total'] = $count;
+        $rst['per_page'] = $step;
+        $rst['current_page'] = $page;var_dump($count / $step);
+        $rst['next_page'] = ($page + 1) > ($count / $step) ? NULL : ($page + 1);
+        $rst['prev_page'] = ($page - 1) < 1 ? NULL : ($page - 1);
+        $rst['first_page'] = 1;
+        $rst['last_page'] = $count / $step;
+        $rst['data'] = $this->get();
+
+        return $rst;
+    }
 
     public function groupBy($field) {
         // is the first time call groupBy method ?

@@ -66,7 +66,7 @@ Class Requests {
      */
     public function __get($key) {
         if (array_key_exists($key, $this->requset)) {
-            return $this->_requset[$key];
+            return $this->requset->$key;
         }
         return NULL;
     }

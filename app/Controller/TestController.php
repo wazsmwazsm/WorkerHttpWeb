@@ -46,11 +46,10 @@ class TestController extends Controller {
         //      ->get();
 
         $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
-          $query->table('ad_promote_info')->where('id', '<', '10');
+          $query->table('ad_promote_info')->where('id', '<', '100');
         })->where('id', '!=', 9)
-        ->orderBy('id', 'DESC')
-        ->limit(0,3)
-        ->get();
+        ->orderBy('id', 'ASC')
+        ->paginate(10, $request->page);
 
 
         return $rst;
