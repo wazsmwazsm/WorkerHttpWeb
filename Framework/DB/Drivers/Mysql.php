@@ -110,7 +110,7 @@ class Mysql implements ConnectorInterface {
         }
     }
 
-    private static function getPlh() {
+    private static function _getPlh() {
         return ':'.uniqid();
     }
 
@@ -173,7 +173,7 @@ class Mysql implements ConnectorInterface {
 
     public function get() {
         $this->_buildQuery();
-        var_dump($this->_query_sql);
+        // var_dump($this->_query_sql);
         $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
         $this->_bindParams();
 
@@ -251,7 +251,7 @@ class Mysql implements ConnectorInterface {
                   throw new PDOException($params[0].' should be Array');
               }
               foreach ($params[0] as $field => $value) {
-                  $plh = self::getPlh();
+                  $plh = self::_getPlh();
                   $construct_str .= ' '.self::_backquote($field).' = '.$plh.' '.$operator;
                   $this->_bind_params[$plh] = $value;
               }
@@ -259,7 +259,7 @@ class Mysql implements ConnectorInterface {
               $construct_str = rtrim($construct_str, $operator);
               break;
           case 2:
-              $plh = self::getPlh();
+              $plh = self::_getPlh();
               $construct_str .= ' '.self::_backquote($params[0]).' = '.$plh.' ';
               $this->_bind_params[$plh] = $params[1];
               break;
@@ -267,13 +267,55 @@ class Mysql implements ConnectorInterface {
               if( ! in_array($params[1], ['<', '>', '<=', '>=', '=', '!=', '<>'])) {
                   throw new PDOException('Confusing Symbol '.$params[1]);
               }
-              $plh = self::getPlh();
+              $plh = self::_getPlh();
               $construct_str .= ' '.self::_backquote($params[0]).' '.$params[1].' '.$plh.' ';
               $this->_bind_params[$plh] = $params[2];
               break;
         }
     }
 
+    private function subBuilder(Closure $callback) {
+
+        // attribute need to store
+        $filters = [
+          '_table',
+          '_query_sql',
+          '_cols_str',
+          '_where_str',
+          '_orderby_str',
+          '_groupby_str',
+          '_having_str',
+          '_join_str',
+        ];
+
+        $stage = [];
+        // store attr
+        foreach ($filters as $filter) {
+            $stage[ltrim($filter, '_')] = $this->$filter;
+        }
+
+        /**************** begin sub query build ****************/
+            // empty attribute
+            $this->_resetBuildStr();
+            // call sub query callback
+            call_user_func($callback, $this);
+            // get sub query build attr
+            $sub_attr = [];
+
+            $this->_buildQuery();
+
+            foreach ($filters as $filter) {
+                $sub_attr[ltrim($filter, '_')] = $this->$filter;
+            }
+        /**************** end sub query build ****************/
+
+        // restore attribute
+        foreach ($filters as $filter) {
+            $this->$filter = $stage[ltrim($filter, '_')];
+        }
+
+        return $sub_attr;
+    }
 
     public function where() {
 
@@ -310,7 +352,7 @@ class Mysql implements ConnectorInterface {
     public function whereIn($field, Array $data, $condition = 'IN', $operator = 'AND') {
         // create placeholder
         foreach ($data as $key => $value) {
-            $plh = self::getPlh();
+            $plh = self::_getPlh();
             $data[$key] = $plh;
             $this->_bind_params[$plh] = $value;
         }
@@ -338,8 +380,8 @@ class Mysql implements ConnectorInterface {
 
     public function whereBetween($field, $start, $end, $operator = 'AND') {
         // create placeholder
-        $start_plh = self::getPlh();
-        $end_plh = self::getPlh();
+        $start_plh = self::_getPlh();
+        $end_plh = self::_getPlh();
         $this->_bind_params[$start_plh] = $start;
         $this->_bind_params[$end_plh] = $end;
 
@@ -380,49 +422,6 @@ class Mysql implements ConnectorInterface {
 
     public function orWhereNotNull($field) {
         return $this->whereNull($field, 'NOT NULL', 'OR');
-    }
-
-    private function subBuilder(Closure $callback) {
-
-        // attribute need to store  
-        $filters = [
-          '_table',
-          '_query_sql',
-          '_cols_str',
-          '_where_str',
-          '_orderby_str',
-          '_groupby_str',
-          '_having_str',
-          '_join_str',
-        ];
-
-        $stage = [];
-        // store attr
-        foreach ($filters as $filter) {
-            $stage[ltrim($filter, '_')] = $this->$filter;
-        }
-
-        /**************** begin sub squery build ****************/
-            // empty attribute
-            $this->_resetBuildStr();
-            // call sub query callback
-            call_user_func($callback, $this);
-            // get sub query build attr
-            $sub_attr = [];
-
-            $this->_buildQuery();
-
-            foreach ($filters as $filter) {
-                $sub_attr[ltrim($filter, '_')] = $this->$filter;
-            }
-        /**************** end sub squery build ****************/
-
-        // restore attribute
-        foreach ($filters as $filter) {
-            $this->$filter = $stage[ltrim($filter, '_')];
-        }
-
-        return $sub_attr;
     }
 
     public function whereBrackets(Closure $callback, $operator = 'AND') {
@@ -468,6 +467,37 @@ class Mysql implements ConnectorInterface {
         return $this->whereExists($callback, 'NOT EXISTS', 'OR');
     }
 
+    public function whereInSub($field, Closure $callback, $condition = 'IN', $operator = 'AND') {
+        // first time call where ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE '.self::_backquote($field).' '.$condition.' ( ';
+        } else {
+            $this->_where_str .= ' '.$operator.' '.self::_backquote($field).' '.$condition.' ( ';
+        }
+
+        $sub_attr = $this->subBuilder($callback);
+        $this->_where_str .= $sub_attr['query_sql'].' ) ';
+
+        return $this;
+    }
+
+    public function whereNotInSub($field, Closure $callback) {
+        return $this->whereInSub($field, $callback, 'NOT IN', 'AND');
+    }
+
+    public function orWhereInSub($field, Closure $callback) {
+        return $this->whereInSub($field, $callback, 'IN', 'OR');
+    }
+
+    public function orWhereNotInSub($field, Closure $callback) {
+        return $this->whereInSub($field, $callback, 'NOT IN', 'OR');
+    }
+
+    public function fromSub(Closure $callback) {
+        $sub_attr = $this->subBuilder($callback);
+        $this->_table .= ' ( '.$sub_attr['query_sql'].' ) AS tb_'.uniqid().' ';
+        return $this;
+    }
 
     public function groupBy($field) {
         // is the first time call groupBy method ?
