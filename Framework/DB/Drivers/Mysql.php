@@ -82,6 +82,17 @@ class Mysql implements ConnectorInterface {
         $this->_bind_params = [];
     }
 
+    private function _resetBuildStr() {
+        $this->_table = '';
+        $this->_query_sql = '';
+        $this->_cols_str = ' * ';
+        $this->_where_str = '';
+        $this->_orderby_str = '';
+        $this->_groupby_str = '';
+        $this->_having_str = '';
+        $this->_join_str = '';
+    }
+
     private function _buildQuery() {
         $this->_query_sql = 'SELECT '.$this->_cols_str.' '.' FROM '.$this->_table.
             $this->_join_str.
@@ -371,6 +382,48 @@ class Mysql implements ConnectorInterface {
         return $this->whereNull($field, 'NOT NULL', 'OR');
     }
 
+    private function subBuilder(Closure $callback) {
+
+        // attribute need to store  
+        $filters = [
+          '_table',
+          '_query_sql',
+          '_cols_str',
+          '_where_str',
+          '_orderby_str',
+          '_groupby_str',
+          '_having_str',
+          '_join_str',
+        ];
+
+        $stage = [];
+        // store attr
+        foreach ($filters as $filter) {
+            $stage[ltrim($filter, '_')] = $this->$filter;
+        }
+
+        /**************** begin sub squery build ****************/
+            // empty attribute
+            $this->_resetBuildStr();
+            // call sub query callback
+            call_user_func($callback, $this);
+            // get sub query build attr
+            $sub_attr = [];
+
+            $this->_buildQuery();
+
+            foreach ($filters as $filter) {
+                $sub_attr[ltrim($filter, '_')] = $this->$filter;
+            }
+        /**************** end sub squery build ****************/
+
+        // restore attribute
+        foreach ($filters as $filter) {
+            $this->$filter = $stage[ltrim($filter, '_')];
+        }
+
+        return $sub_attr;
+    }
 
     public function whereBrackets(Closure $callback, $operator = 'AND') {
         // first time call where ?
@@ -379,14 +432,9 @@ class Mysql implements ConnectorInterface {
         } else {
             $this->_where_str .= ' '.$operator.' ( ';
         }
-        // save tmp
-        $where = $this->_where_str;
-        $this->_where_str = '';
+        $sub_attr = $this->subBuilder($callback);
 
-        call_user_func($callback, $this);
-        // recreate where string
-        $this->_where_str = preg_replace('/WHERE/', '', $this->_where_str, 1);
-        $this->_where_str = $where.$this->_where_str.' ) ';
+        $this->_where_str .= preg_replace('/WHERE/', '', $sub_attr['where_str'], 1).' ) ';
 
         return $this;
     }
@@ -402,34 +450,9 @@ class Mysql implements ConnectorInterface {
         } else {
             $this->_where_str .= ' '.$operator.' '.$condition.' ( ';
         }
-        // save tmp
-        $table = $this->_table;
-        $cols_str = $this->_cols_str;
-        $where_str = $this->_where_str;
-        $orderby_str = $this->_orderby_str;
-        $groupby_str = $this->_groupby_str;
-        $having_str = $this->_having_str;
-        $join_str = $this->_join_str;
 
-        $this->_table = '';
-        $this->_cols_str = ' * ';
-        $this->_where_str = '';
-        $this->_orderby_str = '';
-        $this->_groupby_str = '';
-        $this->_having_str = '';
-        $this->_join_str = '';
-
-        call_user_func($callback, $this);
-        // recreate where string
-        $this->_buildQuery();
-        $this->_where_str = $where_str.$this->_query_sql.' ) ';
-        $this->_query_sql = '';
-        $this->_table = $table;
-        $this->_cols_str = $cols_str;
-        $this->_orderby_str = $orderby_str;
-        $this->_groupby_str = $groupby_str;
-        $this->_having_str = $having_str;
-        $this->_join_str = $join_str;
+        $sub_attr = $this->subBuilder($callback);
+        $this->_where_str .= $sub_attr['query_sql'].' ) ';
 
         return $this;
     }

@@ -20,14 +20,14 @@ class TestController extends Controller {
         //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
 
-        // $rst = DB::$connection['con2']->table('ad_promote_collect')
-        //      ->where('id', '<', 10)
-        //      ->orWhereBrackets(function($query) {
-        //         $query->where('adId', '001-001')
-        //               ->orWhere('adId', '001-003');
-        //      })
-        //      ->orderBy('id', 'DESC')
-        //      ->get();
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+             ->where('id', '<', 10)
+             ->orWhereBrackets(function($query) {
+                $query->where('adId', '001-001')
+                      ->orWhere('adId', '001-003');
+             })
+             ->orderBy('id', 'DESC')
+             ->get();
 
         // $rst = DB::$connection['con1']->table('ad_promote_info')
         //       ->list('id');
@@ -37,16 +37,17 @@ class TestController extends Controller {
         //      ->whereNull('adStyle')
         //      ->whereNotNull('package_name')
         //      ->get();
-        $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->where('id', '<', 10)
-             ->whereExists(function($query) {
-                  $query->table('ad_promote_info')
-                        ->select('adId')
-                        ->whereNotNull('adId')
-                        ->groupBy('adId')
-                        ->having('count(adId)', '>', 30);
-             })
-             ->get();
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        //      ->where('id', '<', 10)
+        //      ->whereExists(function($query) {
+        //           $query->table('ad_promote_info')
+        //                 ->select('adId')
+        //                 ->whereNotNull('adId')
+        //                 ->groupBy('adId')
+        //                 ->having('count(adId)', '>', 3);
+        //      })
+        //      ->orderBy('id', 'DESC')
+        //      ->get();
 
 
         return $rst;
