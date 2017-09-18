@@ -49,6 +49,7 @@ class TestController extends Controller {
           $query->table('ad_promote_info')->where('id', '<', '10');
         })->where('id', '!=', 9)
         ->orderBy('id', 'DESC')
+        ->limit(0,3)
         ->get();
 
 

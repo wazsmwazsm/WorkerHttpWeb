@@ -28,6 +28,7 @@ class Mysql implements ConnectorInterface {
     private $_groupby_str = '';
     private $_having_str = '';
     private $_join_str = '';
+    private $_limit_str = '';
     private $_bind_params = [];
 
     public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8') {
@@ -79,6 +80,7 @@ class Mysql implements ConnectorInterface {
         $this->_groupby_str = '';
         $this->_having_str = '';
         $this->_join_str = '';
+        $this->_limit_str = '';
         $this->_bind_params = [];
     }
 
@@ -91,6 +93,7 @@ class Mysql implements ConnectorInterface {
         $this->_groupby_str = '';
         $this->_having_str = '';
         $this->_join_str = '';
+        $this->_limit_str = '';
     }
 
     private function _buildQuery() {
@@ -98,7 +101,8 @@ class Mysql implements ConnectorInterface {
             $this->_join_str.
             $this->_where_str.
             $this->_groupby_str.$this->_having_str.
-            $this->_orderby_str;
+            $this->_orderby_str.
+            $this->_limit_str;
     }
 
 
@@ -286,6 +290,7 @@ class Mysql implements ConnectorInterface {
           '_groupby_str',
           '_having_str',
           '_join_str',
+          '_limit_str',
         ];
 
         $stage = [];
@@ -498,6 +503,12 @@ class Mysql implements ConnectorInterface {
         $this->_table .= ' ( '.$sub_attr['query_sql'].' ) AS tb_'.uniqid().' ';
         return $this;
     }
+
+    public function limit($offset, $step) {
+        $this->_limit_str = ' LIMIT '.$offset.' , '.$step.' ';
+        return $this;
+    }
+
 
     public function groupBy($field) {
         // is the first time call groupBy method ?
