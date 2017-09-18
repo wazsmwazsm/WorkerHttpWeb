@@ -4,7 +4,7 @@ use PDO;
 use PDOException;
 use Closure;
 /**
- * Mysql
+ * Mysql Driver
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
@@ -263,28 +263,6 @@ class Mysql implements ConnectorInterface {
         }
     }
 
-    public function brackets(Closure $callback, $operator = 'AND') {
-        // first time call where ?
-        if($this->_where_str == '') {
-            $this->_where_str = ' WHERE ( ';
-        } else {
-            $this->_where_str .= ' '.$operator.' ( ';
-        }
-        // save tmp
-        $where = $this->_where_str;
-        $this->_where_str = '';
-
-        call_user_func($callback, $this);
-        // recreate where string
-        $this->_where_str = preg_replace('/WHERE/', '', $this->_where_str, 1);
-        $this->_where_str = $where.$this->_where_str.' ) ';
-
-        return $this;
-    }
-
-    public function orBrackets(Closure $callback) {
-        return $this->brackets($callback, 'OR');
-    }
 
     public function where() {
 
@@ -392,6 +370,81 @@ class Mysql implements ConnectorInterface {
     public function orWhereNotNull($field) {
         return $this->whereNull($field, 'NOT NULL', 'OR');
     }
+
+
+    public function whereBrackets(Closure $callback, $operator = 'AND') {
+        // first time call where ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE ( ';
+        } else {
+            $this->_where_str .= ' '.$operator.' ( ';
+        }
+        // save tmp
+        $where = $this->_where_str;
+        $this->_where_str = '';
+
+        call_user_func($callback, $this);
+        // recreate where string
+        $this->_where_str = preg_replace('/WHERE/', '', $this->_where_str, 1);
+        $this->_where_str = $where.$this->_where_str.' ) ';
+
+        return $this;
+    }
+
+    public function orWhereBrackets(Closure $callback) {
+        return $this->whereBrackets($callback, 'OR');
+    }
+
+    public function whereExists(Closure $callback, $condition = 'EXISTS', $operator = 'AND') {
+        // first time call where ?
+        if($this->_where_str == '') {
+            $this->_where_str = ' WHERE '.$condition.' ( ';
+        } else {
+            $this->_where_str .= ' '.$operator.' '.$condition.' ( ';
+        }
+        // save tmp
+        $table = $this->_table;
+        $cols_str = $this->_cols_str;
+        $where_str = $this->_where_str;
+        $orderby_str = $this->_orderby_str;
+        $groupby_str = $this->_groupby_str;
+        $having_str = $this->_having_str;
+        $join_str = $this->_join_str;
+
+        $this->_table = '';
+        $this->_cols_str = ' * ';
+        $this->_where_str = '';
+        $this->_orderby_str = '';
+        $this->_groupby_str = '';
+        $this->_having_str = '';
+        $this->_join_str = '';
+
+        call_user_func($callback, $this);
+        // recreate where string
+        $this->_buildQuery();
+        $this->_where_str = $where_str.$this->_query_sql.' ) ';
+        $this->_query_sql = '';
+        $this->_table = $table;
+        $this->_cols_str = $cols_str;
+        $this->_orderby_str = $orderby_str;
+        $this->_groupby_str = $groupby_str;
+        $this->_having_str = $having_str;
+        $this->_join_str = $join_str;
+
+        return $this;
+    }
+
+    public function whereNotExists(Closure $callback) {
+        return $this->whereExists($callback, 'NOT EXISTS', 'AND');
+    }
+
+    public function orWhereExists(Closure $callback) {
+        return $this->whereExists($callback, 'EXISTS', 'OR');
+    }
+    public function orWhereNotExists(Closure $callback) {
+        return $this->whereExists($callback, 'NOT EXISTS', 'OR');
+    }
+
 
     public function groupBy($field) {
         // is the first time call groupBy method ?

@@ -22,7 +22,7 @@ class TestController extends Controller {
 
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //      ->where('id', '<', 10)
-        //      ->orBrackets(function($query) {
+        //      ->orWhereBrackets(function($query) {
         //         $query->where('adId', '001-001')
         //               ->orWhere('adId', '001-003');
         //      })
@@ -33,8 +33,19 @@ class TestController extends Controller {
         //       ->list('id');
         // $rst = (string) $rst;
 
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        //      ->whereNull('adStyle')
+        //      ->whereNotNull('package_name')
+        //      ->get();
         $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->whereNull('adStyle')
+             ->where('id', '<', 10)
+             ->whereExists(function($query) {
+                  $query->table('ad_promote_info')
+                        ->select('adId')
+                        ->whereNotNull('adId')
+                        ->groupBy('adId')
+                        ->having('count(adId)', '>', 30);
+             })
              ->get();
 
 
