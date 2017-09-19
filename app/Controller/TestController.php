@@ -45,12 +45,34 @@ class TestController extends Controller {
         //      ->orderBy('id', 'DESC')
         //      ->get();
 
-        $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
-          $query->table('ad_promote_info')->where('id', '<', '100');
-        })->where('id', '!=', 9)
-        ->orderBy('id', 'ASC')
-        ->paginate(10, $request->page);
+        // $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
+        //   $query->table('ad_promote_info')->where('id', '<', '100');
+        // })->where('id', '!=', 9)
+        // ->orderBy('id', 'ASC')
+        // ->paginate(10, $request->page);
 
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')->insert([
+        //   'package_name' => 'aa',
+        //   'adId' => '007-008',
+        //   'adStyle' => 'big_ad',
+        //   'request' => 0,
+        //   'impression' => 20,
+        //   'click' => 10,
+        //   'date' => time(),
+        // ]);
+
+
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        // ->where('package_name', 'aa')
+        // ->update([
+        //   'impression' => 20,
+        //   'click' => 10,
+        // ]);
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+        ->where('package_name', 'aa')
+        ->delete();
+
+        $rst = (string) $rst;
 
         return $rst;
     }

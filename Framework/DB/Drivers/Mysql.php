@@ -41,6 +41,10 @@ class Mysql implements ConnectorInterface {
     private $_having_str = '';
     private $_join_str = '';
     private $_limit_str = '';
+
+    private $_insert_str = '';
+    private $_update_str = '';
+
     private $_bind_params = [];
 
     public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8') {
@@ -93,6 +97,8 @@ class Mysql implements ConnectorInterface {
         $this->_having_str = '';
         $this->_join_str = '';
         $this->_limit_str = '';
+        $this->_insert_str = '';
+        $this->_update_str = '';
         $this->_bind_params = [];
     }
 
@@ -117,6 +123,17 @@ class Mysql implements ConnectorInterface {
             $this->_limit_str;
     }
 
+    private function _buildInsert() {
+        $this->_query_sql = 'INSERT INTO '.$this->_table.$this->_insert_str;
+    }
+
+    private function _buildUpdate() {
+        $this->_query_sql = 'UPDATE '.$this->_table.$this->_update_str.$this->_where_str;
+    }
+
+    private function _buildDelete() {
+        $this->_query_sql = 'DELETE FROM '.$this->_table.$this->_where_str;
+    }
 
     private function _bindParams() {
         if(is_array($this->_bind_params)) {
@@ -541,14 +558,14 @@ class Mysql implements ConnectorInterface {
 
         $this->limit($step * ($page - 1), $step);
 
-        $rst['total'] = $count;
-        $rst['per_page'] = $step;
+        $rst['total']        = $count;
+        $rst['per_page']     = $step;
         $rst['current_page'] = $page;var_dump($count / $step);
-        $rst['next_page'] = ($page + 1) > ($count / $step) ? NULL : ($page + 1);
-        $rst['prev_page'] = ($page - 1) < 1 ? NULL : ($page - 1);
-        $rst['first_page'] = 1;
-        $rst['last_page'] = $count / $step;
-        $rst['data'] = $this->get();
+        $rst['next_page']    = ($page + 1) > ($count / $step) ? NULL : ($page + 1);
+        $rst['prev_page']    = ($page - 1) < 1 ? NULL : ($page - 1);
+        $rst['first_page']   = 1;
+        $rst['last_page']    = $count / $step;
+        $rst['data']         = $this->get();
 
         return $rst;
     }
@@ -634,16 +651,74 @@ class Mysql implements ConnectorInterface {
 
 
 
-    public function insert() {
+    public function insert(Array $data) {
+        $field_str = '';
+        $value_str = '';
+        foreach ($data as $key => $value) {
+            $field_str .= ' '.self::_backquote($key).',';
+            $plh = self::_getPlh();
+            $this->_bind_params[$plh] = $value;
+            $value_str .= ' '.$plh.',';
+        }
 
+        $field_str = rtrim($field_str, ',');
+        $value_str = rtrim($value_str, ',');
+
+        $this->_insert_str = ' ('.$field_str.') VALUES ('.$value_str.') ';
+
+        $this->_buildInsert();
+        
+        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+        $this->_bindParams();
+
+        $this->_reset();
+        $this->_pdoSt->execute();
+
+        if($this->_pdoSt->rowCount() > 0) {
+            return $this->_pdo->lastInsertId();
+        }
+
+        return NULL;
     }
 
-    public function update() {
+    public function update(Array $data) {
+        if(empty($this->_where_str)) {
+            throw new Exception("Need where condition");
+        }
 
+        $this->_update_str = ' SET ';
+        foreach ($data as $key => $value) {
+            $plh = self::_getPlh();
+            $this->_bind_params[$plh] = $value;
+            $this->_update_str .= ' '.self::_backquote($key).' = '.$plh.',';
+        }
+
+        $this->_update_str = rtrim($this->_update_str, ',');
+
+        $this->_buildUpdate();
+        var_dump($this->_query_sql);
+        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+        $this->_bindParams();
+
+        $this->_reset();
+        $this->_pdoSt->execute();
+        return $this->_pdoSt->rowCount();
     }
 
     public function delete() {
+        if(empty($this->_where_str)) {
+            throw new \Exception("Need where condition");
+        }
 
+        $this->_buildDelete();
+        var_dump($this->_query_sql);
+        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+        $this->_bindParams();
+
+        $this->_reset();
+        $this->_pdoSt->execute();
+
+        return $this->_pdoSt->rowCount();
     }
 
 }
