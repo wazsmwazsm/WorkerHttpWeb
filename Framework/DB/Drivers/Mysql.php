@@ -76,10 +76,15 @@ class Mysql implements ConnectorInterface {
             // disables emulation of prepared statements
             $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
         } catch (PDOException $e) {
-            throw new PDOException($e->getMessage());
+            $this->_closeConnection();
+            throw $e;
         }
     }
 
+    private function _closeConnection()
+    {
+        $this->_pdo = NULL;
+    }
 
     public function table($table) {
         $this->_table = self::_backquote($table);
@@ -133,6 +138,34 @@ class Mysql implements ConnectorInterface {
 
     private function _buildDelete() {
         $this->_query_sql = 'DELETE FROM '.$this->_table.$this->_where_str;
+    }
+
+    private function _execute() {
+        try {
+            $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+            $this->_bindParams();
+            $this->_reset();
+            $this->_pdoSt->execute();
+        } catch (PDOException $e) {
+            if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+                $this->_closeConnection();
+                $this->_connect();
+
+                try {
+                    $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+                    $this->_bindParams();
+                    $this->_reset();
+                    $this->_pdoSt->execute();
+                } catch (PDOException $e) {
+                    throw $e;
+                }
+
+            } else {
+                throw $e;
+            }
+        }
+
+
     }
 
     private function _bindParams() {
@@ -192,37 +225,27 @@ class Mysql implements ConnectorInterface {
     }
 
 
-    public function debugDumpParams() {
-        $this->_buildQuery();
-
-        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
-        $this->_bindParams();
-
-        $this->_reset();
-        $this->_pdoSt->execute();
-
-        return $this->_pdoSt->debugDumpParams();
-    }
+    // public function debugDumpParams() {
+    //     $this->_buildQuery();
+    //
+    //     $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+    //     $this->_bindParams();
+    //
+    //     $this->_reset();
+    //     $this->_pdoSt->execute();
+    //
+    //     return $this->_pdoSt->debugDumpParams();
+    // }
 
     public function get() {
         $this->_buildQuery();
-        var_dump($this->_query_sql);
-        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
-        $this->_bindParams();
-
-        $this->_reset();
-        $this->_pdoSt->execute();
+        $this->_execute();
         return $this->_pdoSt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function row() {
         $this->_buildQuery();
-
-        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
-        $this->_bindParams();
-
-        $this->_reset();
-        $this->_pdoSt->execute();
+        $this->_execute();
         return $this->_pdoSt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -638,18 +661,61 @@ class Mysql implements ConnectorInterface {
     }
 
     public function query($sql) {
-        return $this->_pdo->query($sql);
+        try {
+            return $this->_pdo->query($sql);
+        } catch (PDOException $e) {
+            if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+                $this->_closeConnection();
+                $this->_connect();
+                try {
+                    return $this->_pdo->query($sql);
+                } catch (Exception $e) {
+                    throw $e;
+                }
+
+            } else {
+                throw $e;
+            }
+        }
     }
 
     public function exec($sql) {
-        return $this->_pdo->exec($sql);
+        try {
+            return $this->_pdo->exec($sql);
+        } catch (PDOException $e) {
+            if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+                $this->_closeConnection();
+                $this->_connect();
+                try {
+                    return $this->_pdo->exec($sql);
+                } catch (Exception $e) {
+                    throw $e;
+                }
+
+            } else {
+                throw $e;
+            }
+        }
     }
 
     public function prepare($sql, Array $driver_options = []) {
-        return $this->_pdo->prepare($sql, $driver_options);
+        try {
+            return $this->_pdo->prepare($sql, $driver_options);
+        } catch (PDOException $e) {
+            if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+                $this->_closeConnection();
+                $this->_connect();
+                try {
+                    return $this->_pdo->prepare($sql, $driver_options);
+                } catch (Exception $e) {
+                    throw $e;
+                }
+
+            } else {
+                throw $e;
+            }
+        }
     }
-
-
 
     public function insert(Array $data) {
         $field_str = '';
@@ -667,12 +733,8 @@ class Mysql implements ConnectorInterface {
         $this->_insert_str = ' ('.$field_str.') VALUES ('.$value_str.') ';
 
         $this->_buildInsert();
-        
-        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
-        $this->_bindParams();
 
-        $this->_reset();
-        $this->_pdoSt->execute();
+        $this->_execute();
 
         if($this->_pdoSt->rowCount() > 0) {
             return $this->_pdo->lastInsertId();
@@ -696,28 +758,18 @@ class Mysql implements ConnectorInterface {
         $this->_update_str = rtrim($this->_update_str, ',');
 
         $this->_buildUpdate();
-        var_dump($this->_query_sql);
-        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
-        $this->_bindParams();
-
-        $this->_reset();
-        $this->_pdoSt->execute();
+        $this->_execute();
         return $this->_pdoSt->rowCount();
     }
 
     public function delete() {
+
         if(empty($this->_where_str)) {
             throw new \Exception("Need where condition");
         }
 
         $this->_buildDelete();
-        var_dump($this->_query_sql);
-        $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
-        $this->_bindParams();
-
-        $this->_reset();
-        $this->_pdoSt->execute();
-
+        $this->_execute();
         return $this->_pdoSt->rowCount();
     }
 
