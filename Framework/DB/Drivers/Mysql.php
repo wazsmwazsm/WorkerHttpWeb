@@ -766,6 +766,14 @@ class Mysql implements ConnectorInterface
         return $this->whereNull($field, 'NOT NULL', 'OR');
     }
 
+    /**
+     * build whereBrackets string
+     *
+     * @param  \Closure $callback
+     * @param  String $operator
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereBrackets(Closure $callback, $operator = 'AND')
     {
         if( ! in_array($operator, ['AND', 'OR'])) {
@@ -784,11 +792,27 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build orWhereBrackets string
+     *
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereBrackets(Closure $callback)
     {
         return $this->whereBrackets($callback, 'OR');
     }
 
+    /**
+     * build whereExists string
+     *
+     * @param  \Closure $callback
+     * @param  String $condition
+     * @param  String $operator
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereExists(Closure $callback, $condition = 'EXISTS', $operator = 'AND')
     {
         if( ! in_array($condition, ['EXISTS', 'NOT EXISTS']) || ! in_array($operator, ['AND', 'OR'])) {
@@ -807,20 +831,52 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build whereNotExists string
+     *
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereNotExists(Closure $callback)
     {
         return $this->whereExists($callback, 'NOT EXISTS', 'AND');
     }
 
+    /**
+     * build orWhereExists string
+     *
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereExists(Closure $callback)
     {
         return $this->whereExists($callback, 'EXISTS', 'OR');
     }
+
+    /**
+     * build orWhereNotExists string
+     *
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereNotExists(Closure $callback)
     {
         return $this->whereExists($callback, 'NOT EXISTS', 'OR');
     }
 
+    /**
+     * build whereInSub string
+     *
+     * @param  String $field
+     * @param  \Closure $callback
+     * @param  String $condition
+     * @param  String $operator
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereInSub($field, Closure $callback, $condition = 'IN', $operator = 'AND')
     {
         if( ! in_array($condition, ['IN', 'NOT IN']) || ! in_array($operator, ['AND', 'OR'])) {
@@ -839,23 +895,52 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build whereNotInSub string
+     *
+     * @param  String $field
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereNotInSub($field, Closure $callback)
     {
         return $this->whereInSub($field, $callback, 'NOT IN', 'AND');
     }
 
+    /**
+     * build orWhereInSub string
+     *
+     * @param  String $field
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereInSub($field, Closure $callback)
     {
         return $this->whereInSub($field, $callback, 'IN', 'OR');
     }
 
+    /**
+     * build orWhereNotInSub string
+     *
+     * @param  String $field
+     * @param  \Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereNotInSub($field, Closure $callback)
     {
         return $this->whereInSub($field, $callback, 'NOT IN', 'OR');
     }
 
 
-
+    /**
+     * build groupBy string
+     *
+     * @param  String $field
+     * @return  self
+     */
     public function groupBy($field)
     {
         // is the first time call groupBy method ?
@@ -868,6 +953,11 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build having string
+     *
+     * @return  self
+     */
     public function having()
     {
         $operator = 'AND';
@@ -884,6 +974,11 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build orHaving string
+     *
+     * @return  self
+     */
     public function orHaving()
     {
         $operator = 'OR';
@@ -900,6 +995,14 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build orderBy string
+     *
+     * @param  String $field
+     * @param  String $mode
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orderBy($field, $mode = 'ASC')
     {
         if( ! in_array($mode, ['ASC', 'DESC'])) {
@@ -915,6 +1018,16 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build join string
+     *
+     * @param  String $table
+     * @param  String $one
+     * @param  String $two
+     * @param  String $type
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function join($table, $one, $two, $type = 'INNER')
     {
         if( ! in_array($type, ['INNER', 'LEFT', 'RIGHT'])) {
@@ -926,16 +1039,42 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build leftJoin string
+     *
+     * @param  String $table
+     * @param  String $one
+     * @param  String $two
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function leftJoin($table, $one, $two)
     {
         return $this->join($table, $one, $two, 'LEFT');
     }
 
+    /**
+     * build rightJoin string
+     *
+     * @param  String $table
+     * @param  String $one
+     * @param  String $two
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function rightJoin($table, $one, $two)
     {
         return $this->join($table, $one, $two, 'RIGHT');
     }
 
+    /**
+     * build rightJoin string
+     *
+     * @param  Closure $callback
+     * @return  self
+     * @throws  \InvalidArgumentException
+     * @throws  \PDOException
+     */
     public function fromSub(Closure $callback)
     {
         $sub_attr = $this->_subBuilder($callback);
@@ -944,6 +1083,13 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build limit string
+     *
+     * @param  Int $offset
+     * @param  Int $step
+     * @return  self
+     */
     public function limit($offset, $step)
     {
         $this->_limit_str = ' LIMIT '.$offset.' , '.$step.' ';
@@ -951,6 +1097,14 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * get paginate data
+     *
+     * @param  Int $step
+     * @param  Int $page
+     * @return  Array
+     * @throws  \PDOException
+     */
     public function paginate($step, $page = NULL)
     {
         // store build attr\bind param
@@ -978,6 +1132,12 @@ class Mysql implements ConnectorInterface
         return $rst;
     }
 
+    /**
+     * get assoc data
+     *
+     * @return  Array
+     * @throws  \PDOException
+     */
     public function get()
     {
         $this->_buildQuery();
@@ -986,6 +1146,12 @@ class Mysql implements ConnectorInterface
         return $this->_pdoSt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * get assoc row data
+     *
+     * @return  Array
+     * @throws  \PDOException
+     */
     public function row()
     {
         $this->_buildQuery();
@@ -994,6 +1160,13 @@ class Mysql implements ConnectorInterface
         return $this->_pdoSt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * get field list
+     *
+     * @param  String $field
+     * @return  Array
+     * @throws  \PDOException
+     */
     public function list($field)
     {
         $this->_cols_str = ' `'.$field.'` ';
@@ -1003,6 +1176,13 @@ class Mysql implements ConnectorInterface
         return $this->_pdoSt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
+    /**
+     * get count
+     *
+     * @param  String $field
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function count($field = '*')
     {
         if(trim($field) != '*') {
@@ -1013,6 +1193,13 @@ class Mysql implements ConnectorInterface
         return $this->row()['count_num'];
     }
 
+    /**
+     * get sum
+     *
+     * @param  String $field
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function sum($field)
     {
         $this->_cols_str = ' SUM(`'.$field.'`) AS sum_num ';
@@ -1020,6 +1207,13 @@ class Mysql implements ConnectorInterface
         return $this->row()['sum_num'];
     }
 
+    /**
+     * get max
+     *
+     * @param  String $field
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function max($field)
     {
         $this->_cols_str = ' MAX(`'.$field.'`) AS max_num ';
@@ -1027,6 +1221,13 @@ class Mysql implements ConnectorInterface
         return $this->row()['max_num'];
     }
 
+    /**
+     * get min
+     *
+     * @param  String $field
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function min($field)
     {
         $this->_cols_str = ' MIN(`'.$field.'`) AS min_num ';
@@ -1034,6 +1235,13 @@ class Mysql implements ConnectorInterface
         return $this->row()['min_num'];
     }
 
+    /**
+     * get avg
+     *
+     * @param  String $field
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function avg($field)
     {
         $this->_cols_str = ' AVG(`'.$field.'`) AS avg_num ';
@@ -1041,6 +1249,13 @@ class Mysql implements ConnectorInterface
         return $this->row()['avg_num'];
     }
 
+    /**
+     * insert data
+     *
+     * @param  Array $data
+     * @return  NULL/Int
+     * @throws  \PDOException
+     */
     public function insert(Array $data)
     {
         // create build str
@@ -1068,6 +1283,13 @@ class Mysql implements ConnectorInterface
         return NULL;
     }
 
+    /**
+     * update data
+     *
+     * @param  Array $data
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function update(Array $data)
     {
         // should not update without where
@@ -1090,6 +1312,12 @@ class Mysql implements ConnectorInterface
         return $this->_pdoSt->rowCount();
     }
 
+    /**
+     * delete data
+     *
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function delete()
     {
         // should not delete without where
@@ -1103,7 +1331,13 @@ class Mysql implements ConnectorInterface
         return $this->_pdoSt->rowCount();
     }
 
-
+    /**
+     * native query, add auto reconnect
+     *
+     * @param  String $sql
+     * @return  \PDOStatement/Boolean
+     * @throws  \PDOException
+     */
     public function query($sql)
     {
         try {
@@ -1127,6 +1361,13 @@ class Mysql implements ConnectorInterface
         }
     }
 
+    /**
+     * native exec, add auto reconnect
+     *
+     * @param  String $sql
+     * @return  Int
+     * @throws  \PDOException
+     */
     public function exec($sql)
     {
         try {
@@ -1150,6 +1391,14 @@ class Mysql implements ConnectorInterface
         }
     }
 
+    /**
+     * native prepare, add auto reconnect
+     *
+     * @param  String $sql
+     * @param  Array $driver_options
+     * @return  \PDOStatement/Boolean
+     * @throws  \PDOException
+     */
     public function prepare($sql, Array $driver_options = [])
     {
         try {
@@ -1173,6 +1422,12 @@ class Mysql implements ConnectorInterface
         }
     }
 
+    /**
+     * begin Transaction, add auto reconnect
+     *
+     * @return  Boolean
+     * @throws  \PDOException
+     */
     public function beginTrans()
     {
         try {
@@ -1196,11 +1451,21 @@ class Mysql implements ConnectorInterface
         }
     }
 
+    /**
+     * commit Transaction
+     *
+     * @return  Boolean
+     */
     public function commitTrans()
     {
         return $this->_pdo->commit();
     }
 
+    /**
+     * rollBack Transaction
+     *
+     * @return  Boolean
+     */
     public function rollBackTrans()
     {
         if ($this->_pdo->inTransaction()) {
