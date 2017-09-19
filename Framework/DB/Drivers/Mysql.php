@@ -89,11 +89,6 @@ class Mysql implements ConnectorInterface
         $this->_pdo = NULL;
     }
 
-    public function table($table)
-    {
-        $this->_table = self::_backquote($table);
-        return $this;
-    }
 
     // memory-resident mode , need manual reset attr
     private function _reset()
@@ -224,96 +219,18 @@ class Mysql implements ConnectorInterface
         return '`'.$str.'`';
     }
 
-    public function select()
-    {
-        $cols = func_get_args();
-
-        if( ! func_num_args() || in_array('*', $cols)) {
-            $this->_cols_str = ' * ';
-        } else {
-            // _cols_str default ' * ' , it easy to get a result when select func dosen't called
-            // but when you call select func , you should set it to ''
-            $this->_cols_str = '';
-            foreach ($cols as $col) {
-                $this->_cols_str .= ' '.self::_backquote($col).',';
-            }
-            $this->_cols_str = rtrim($this->_cols_str, ',');
-        }
-
-        return $this;
-    }
-
-    public function get()
-    {
-        $this->_buildQuery();
-        $this->_execute();
-        return $this->_pdoSt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function row()
-    {
-        $this->_buildQuery();
-        $this->_execute();
-        return $this->_pdoSt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function list($field)
-    {
-        $this->_cols_str = ' `'.$field.'` AS col_list ';
-        return array_column($this->get(), 'col_list');
-    }
-
-    public function count($field = '*')
-    {
-        if(trim($field) != '*') {
-            $field = '`'.$field.'`';
-        }
-        $this->_cols_str = ' COUNT('.$field.') AS count_num ';
-
-        return $this->row()['count_num'];
-    }
-
-    public function sum($field)
-    {
-        $this->_cols_str = ' SUM(`'.$field.'`) AS sum_num ';
-
-        return $this->row()['sum_num'];
-    }
-
-    public function max($field)
-    {
-        $this->_cols_str = ' MAX(`'.$field.'`) AS max_num ';
-
-        return $this->row()['max_num'];
-    }
-
-    public function min($field)
-    {
-        $this->_cols_str = ' MIN(`'.$field.'`) AS min_num ';
-
-        return $this->row()['min_num'];
-    }
-
-    public function avg($field)
-    {
-        $this->_cols_str = ' AVG(`'.$field.'`) AS avg_num ';
-
-        return $this->row()['avg_num'];
-    }
-
-
     private function _condition_constructor($args_num, $params, $operator, &$construct_str)
     {
         // params dose not conform to specification
         if( ! $args_num || $args_num > 3) {
-            throw new InvalidArgumentException("Error number of parameters");
+            throw new \InvalidArgumentException("Error number of parameters");
         }
         // argurment mode
         switch ($args_num) {
           // assoc array mode
           case 1:
               if( ! is_array($params[0])) {
-                  throw new InvalidArgumentException($params[0].' should be Array');
+                  throw new \InvalidArgumentException($params[0].' should be Array');
               }
               foreach ($params[0] as $field => $value) {
                   $plh = self::_getPlh();
@@ -332,7 +249,7 @@ class Mysql implements ConnectorInterface
           // ('a', '>', 10) : a > 10 mode
           case 3:
               if( ! in_array($params[1], ['<', '>', '<=', '>=', '=', '!=', '<>'])) {
-                  throw new InvalidArgumentException('Confusing Symbol '.$params[1]);
+                  throw new \InvalidArgumentException('Confusing Symbol '.$params[1]);
               }
               $plh = self::_getPlh();
               $construct_str .= ' '.self::_backquote($params[0]).' '.$params[1].' '.$plh.' ';
@@ -396,6 +313,34 @@ class Mysql implements ConnectorInterface
         return $sub_attr;
     }
 
+
+    public function table($table)
+    {
+        $this->_table = self::_backquote($table);
+        
+        return $this;
+    }
+
+    public function select()
+    {
+        $cols = func_get_args();
+
+        if( ! func_num_args() || in_array('*', $cols)) {
+            $this->_cols_str = ' * ';
+        } else {
+            // _cols_str default ' * ' , it easy to get a result when select func dosen't called
+            // but when you call select func , you should set it to ''
+            $this->_cols_str = '';
+            foreach ($cols as $col) {
+                $this->_cols_str .= ' '.self::_backquote($col).',';
+            }
+            $this->_cols_str = rtrim($this->_cols_str, ',');
+        }
+
+        return $this;
+    }
+
+
     public function where()
     {
         $operator = 'AND';
@@ -428,6 +373,9 @@ class Mysql implements ConnectorInterface
 
     public function whereIn($field, Array $data, $condition = 'IN', $operator = 'AND')
     {
+        if( ! in_array($condition, ['IN', 'NOT IN']) || ! in_array($operator, ['AND', 'OR'])) {
+            throw new \InvalidArgumentException("Error whereIn mode");
+        }
         // create placeholder
         foreach ($data as $key => $value) {
             $plh = self::_getPlh();
@@ -461,6 +409,9 @@ class Mysql implements ConnectorInterface
 
     public function whereBetween($field, $start, $end, $operator = 'AND')
     {
+        if( ! in_array($operator, ['AND', 'OR'])) {
+            throw new \InvalidArgumentException("Logical operator");
+        }
         // create placeholder
         $start_plh = self::_getPlh();
         $end_plh = self::_getPlh();
@@ -484,6 +435,9 @@ class Mysql implements ConnectorInterface
 
     public function whereNull($field, $condition = 'NULL', $operator = 'AND')
     {
+        if( ! in_array($operator, ['AND', 'OR'])) {
+            throw new \InvalidArgumentException("Logical operator");
+        }
         // is the first time call where method ?
         if($this->_where_str == '') {
             $this->_where_str = ' WHERE ';
@@ -513,6 +467,9 @@ class Mysql implements ConnectorInterface
 
     public function whereBrackets(Closure $callback, $operator = 'AND')
     {
+        if( ! in_array($operator, ['AND', 'OR'])) {
+            throw new \InvalidArgumentException("Logical operator");
+        }
         // first time call where ?
         if($this->_where_str == '') {
             $this->_where_str = ' WHERE ( ';
@@ -533,6 +490,9 @@ class Mysql implements ConnectorInterface
 
     public function whereExists(Closure $callback, $condition = 'EXISTS', $operator = 'AND')
     {
+        if( ! in_array($condition, ['EXISTS', 'NOT EXISTS']) || ! in_array($operator, ['AND', 'OR'])) {
+            throw new \InvalidArgumentException("Error whereExists mode");
+        }
         // first time call where ?
         if($this->_where_str == '') {
             $this->_where_str = ' WHERE '.$condition.' ( ';
@@ -562,6 +522,9 @@ class Mysql implements ConnectorInterface
 
     public function whereInSub($field, Closure $callback, $condition = 'IN', $operator = 'AND')
     {
+        if( ! in_array($condition, ['IN', 'NOT IN']) || ! in_array($operator, ['AND', 'OR'])) {
+            throw new \InvalidArgumentException("Error whereIn mode");
+        }
         // first time call where ?
         if($this->_where_str == '') {
             $this->_where_str = ' WHERE '.self::_backquote($field).' '.$condition.' ( ';
@@ -590,47 +553,7 @@ class Mysql implements ConnectorInterface
         return $this->whereInSub($field, $callback, 'NOT IN', 'OR');
     }
 
-    public function fromSub(Closure $callback)
-    {
-        $sub_attr = $this->_subBuilder($callback);
-        $this->_table .= ' ( '.$sub_attr['query_sql'].' ) AS tb_'.uniqid().' ';
 
-        return $this;
-    }
-
-    public function limit($offset, $step)
-    {
-        $this->_limit_str = ' LIMIT '.$offset.' , '.$step.' ';
-
-        return $this;
-    }
-
-    public function paginate($step, $page = NULL)
-    {
-        // store build attr\bind param
-        $store = $this->_storeAttr();
-        $bind_params = $this->_storeBindParam();
-        // get count
-        $count = $this->count();
-        // restore build attr\bind param
-        $this->_reStoreAttr($store);
-        $this->_reStoreBindParam($bind_params);
-
-        $page = $page ? $page : 1;
-
-        $this->limit($step * ($page - 1), $step);
-
-        $rst['total']        = $count;
-        $rst['per_page']     = $step;
-        $rst['current_page'] = $page;var_dump($count / $step);
-        $rst['next_page']    = ($page + 1) > ($count / $step) ? NULL : ($page + 1);
-        $rst['prev_page']    = ($page - 1) < 1 ? NULL : ($page - 1);
-        $rst['first_page']   = 1;
-        $rst['last_page']    = $count / $step;
-        $rst['data']         = $this->get();
-
-        return $rst;
-    }
 
     public function groupBy($field)
     {
@@ -678,6 +601,9 @@ class Mysql implements ConnectorInterface
 
     public function orderBy($field, $mode = 'ASC')
     {
+        if( ! in_array($mode, ['ASC', 'DESC'])) {
+            throw new \InvalidArgumentException("Error order by mode");
+        }
         // is the first time call orderBy method ?
         if($this->_orderby_str == '') {
             $this->_orderby_str = ' ORDER BY '.self::_backquote($field).' '.$mode;
@@ -690,6 +616,9 @@ class Mysql implements ConnectorInterface
 
     public function join($table, $one, $two, $type = 'INNER')
     {
+        if( ! in_array($type, ['INNER', 'LEFT', 'RIGHT'])) {
+            throw new \InvalidArgumentException("Error join mode");
+        }
         // create join string
         $this->_join_str .= ' '.$type.' JOIN '.self::_backquote($table).
             ' ON '.self::_backquote($one).' = '.self::_backquote($two);
@@ -706,17 +635,188 @@ class Mysql implements ConnectorInterface
         return $this->join($table, $one, $two, 'RIGHT');
     }
 
+    public function fromSub(Closure $callback)
+    {
+        $sub_attr = $this->_subBuilder($callback);
+        $this->_table .= ' ( '.$sub_attr['query_sql'].' ) AS tb_'.uniqid().' ';
+
+        return $this;
+    }
+
+    public function limit($offset, $step)
+    {
+        $this->_limit_str = ' LIMIT '.$offset.' , '.$step.' ';
+
+        return $this;
+    }
+
+    public function paginate($step, $page = NULL)
+    {
+        // store build attr\bind param
+        $store = $this->_storeAttr();
+        $bind_params = $this->_storeBindParam();
+        // get count
+        $count = $this->count();
+        // restore build attr\bind param
+        $this->_reStoreAttr($store);
+        $this->_reStoreBindParam($bind_params);
+
+        // create paginate data
+        $page = $page ? $page : 1;
+        $this->limit($step * ($page - 1), $step);
+
+        $rst['total']        = $count;
+        $rst['per_page']     = $step;
+        $rst['current_page'] = $page;var_dump($count / $step);
+        $rst['next_page']    = ($page + 1) > ($count / $step) ? NULL : ($page + 1);
+        $rst['prev_page']    = ($page - 1) < 1 ? NULL : ($page - 1);
+        $rst['first_page']   = 1;
+        $rst['last_page']    = $count / $step;
+        $rst['data']         = $this->get();
+
+        return $rst;
+    }
+
+    public function get()
+    {
+        $this->_buildQuery();
+        $this->_execute();
+
+        return $this->_pdoSt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function row()
+    {
+        $this->_buildQuery();
+        $this->_execute();
+
+        return $this->_pdoSt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function list($field)
+    {
+        $this->_cols_str = ' `'.$field.'` ';
+        $this->_buildQuery();
+        $this->_execute();
+
+        return $this->_pdoSt->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
+
+    public function count($field = '*')
+    {
+        if(trim($field) != '*') {
+            $field = '`'.$field.'`';
+        }
+        $this->_cols_str = ' COUNT('.$field.') AS count_num ';
+
+        return $this->row()['count_num'];
+    }
+
+    public function sum($field)
+    {
+        $this->_cols_str = ' SUM(`'.$field.'`) AS sum_num ';
+
+        return $this->row()['sum_num'];
+    }
+
+    public function max($field)
+    {
+        $this->_cols_str = ' MAX(`'.$field.'`) AS max_num ';
+
+        return $this->row()['max_num'];
+    }
+
+    public function min($field)
+    {
+        $this->_cols_str = ' MIN(`'.$field.'`) AS min_num ';
+
+        return $this->row()['min_num'];
+    }
+
+    public function avg($field)
+    {
+        $this->_cols_str = ' AVG(`'.$field.'`) AS avg_num ';
+
+        return $this->row()['avg_num'];
+    }
+
+    public function insert(Array $data)
+    {
+        // create build str
+        $field_str = '';
+        $value_str = '';
+        foreach ($data as $key => $value) {
+            $field_str .= ' '.self::_backquote($key).',';
+            $plh = self::_getPlh();
+            $this->_bind_params[$plh] = $value;
+            $value_str .= ' '.$plh.',';
+        }
+
+        $field_str = rtrim($field_str, ',');
+        $value_str = rtrim($value_str, ',');
+
+        $this->_insert_str = ' ('.$field_str.') VALUES ('.$value_str.') ';
+        // execute
+        $this->_buildInsert();
+        $this->_execute();
+
+        if($this->_pdoSt->rowCount() > 0) {
+            return $this->_pdo->lastInsertId();
+        }
+
+        return NULL;
+    }
+
+    public function update(Array $data)
+    {
+        // should not update without where
+        if(empty($this->_where_str)) {
+            throw new \InvalidArgumentException("Need where condition");
+        }
+        // create build str
+        $this->_update_str = ' SET ';
+        foreach ($data as $key => $value) {
+            $plh = self::_getPlh();
+            $this->_bind_params[$plh] = $value;
+            $this->_update_str .= ' '.self::_backquote($key).' = '.$plh.',';
+        }
+
+        $this->_update_str = rtrim($this->_update_str, ',');
+
+        $this->_buildUpdate();
+        $this->_execute();
+
+        return $this->_pdoSt->rowCount();
+    }
+
+    public function delete()
+    {
+        // should not delete without where
+        if(empty($this->_where_str)) {
+            throw new \InvalidArgumentException("Need where condition");
+        }
+
+        $this->_buildDelete();
+        $this->_execute();
+
+        return $this->_pdoSt->rowCount();
+    }
+
+
     public function query($sql)
     {
         try {
             return $this->_pdo->query($sql);
         } catch (PDOException $e) {
+            // when time out, reconnect
             if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+
                 $this->_closeConnection();
                 $this->_connect();
+
                 try {
                     return $this->_pdo->query($sql);
-                } catch (Exception $e) {
+                } catch (PDOException $e) {
                     throw $e;
                 }
 
@@ -731,12 +831,15 @@ class Mysql implements ConnectorInterface
         try {
             return $this->_pdo->exec($sql);
         } catch (PDOException $e) {
+            // when time out, reconnect
             if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+
                 $this->_closeConnection();
                 $this->_connect();
+
                 try {
                     return $this->_pdo->exec($sql);
-                } catch (Exception $e) {
+                } catch (PDOException $e) {
                     throw $e;
                 }
 
@@ -751,12 +854,15 @@ class Mysql implements ConnectorInterface
         try {
             return $this->_pdo->prepare($sql, $driver_options);
         } catch (PDOException $e) {
+            // when time out, reconnect
             if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+
                 $this->_closeConnection();
                 $this->_connect();
+
                 try {
                     return $this->_pdo->prepare($sql, $driver_options);
-                } catch (Exception $e) {
+                } catch (PDOException $e) {
                     throw $e;
                 }
 
@@ -765,63 +871,4 @@ class Mysql implements ConnectorInterface
             }
         }
     }
-
-    public function insert(Array $data)
-    {
-        $field_str = '';
-        $value_str = '';
-        foreach ($data as $key => $value) {
-            $field_str .= ' '.self::_backquote($key).',';
-            $plh = self::_getPlh();
-            $this->_bind_params[$plh] = $value;
-            $value_str .= ' '.$plh.',';
-        }
-
-        $field_str = rtrim($field_str, ',');
-        $value_str = rtrim($value_str, ',');
-
-        $this->_insert_str = ' ('.$field_str.') VALUES ('.$value_str.') ';
-
-        $this->_buildInsert();
-
-        $this->_execute();
-
-        if($this->_pdoSt->rowCount() > 0) {
-            return $this->_pdo->lastInsertId();
-        }
-
-        return NULL;
-    }
-
-    public function update(Array $data)
-    {
-        if(empty($this->_where_str)) {
-            throw new Exception("Need where condition");
-        }
-
-        $this->_update_str = ' SET ';
-        foreach ($data as $key => $value) {
-            $plh = self::_getPlh();
-            $this->_bind_params[$plh] = $value;
-            $this->_update_str .= ' '.self::_backquote($key).' = '.$plh.',';
-        }
-
-        $this->_update_str = rtrim($this->_update_str, ',');
-
-        $this->_buildUpdate();
-        $this->_execute();
-        return $this->_pdoSt->rowCount();
-    }
-
-    public function delete()
-    {
-        if(empty($this->_where_str)) {
-            throw new \Exception("Need where condition");
-        }
-
-        $this->_buildDelete();
-        $this->_execute();
-        return $this->_pdoSt->rowCount();
-    }
-
 }

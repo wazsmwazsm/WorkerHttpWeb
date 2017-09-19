@@ -29,7 +29,7 @@ class TestController extends Controller {
         //      ->orderBy('id', 'DESC')
         //      ->get();
 
-        // $rst = DB::$connection['con1']->table('ad_promote_info')
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //       ->list('id');
         // $rst = (string) $rst;
 
@@ -37,13 +37,13 @@ class TestController extends Controller {
         //      ->whereNull('adStyle')
         //      ->whereNotNull('package_name')
         //      ->get();
-        // $rst = DB::$connection['con2']->table('ad_promote_collect')
-        //      ->whereInSub('id', function($query) {
-        //           $query->table('ad_promote_info')
-        //                 ->select('id')->where('id', '<', '10');
-        //      })
-        //      ->orderBy('id', 'DESC')
-        //      ->get();
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+             ->whereInSub('id', function($query) {
+                  $query->table('ad_promote_info')
+                        ->select('id')->where('id', '<', '10');
+             })
+             ->orderBy('id', 'DEsSC')
+             ->get();
 
         // $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
         //   $query->table('ad_promote_info')->where('id', '<', '100');
@@ -68,11 +68,11 @@ class TestController extends Controller {
         //   'impression' => 20,
         //   'click' => 10,
         // ]);
-        $rst = DB::$connection['con2']->table('ad_promote_collect')
-        ->where('package_name', 'aa')
-        ->delete();
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        // ->where('package_name', 'aa')
+        // ->delete();
 
-        $rst = (string) $rst;
+        // $rst = (string) $rst;
 
         return $rst;
     }
