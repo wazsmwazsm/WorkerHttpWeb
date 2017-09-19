@@ -317,7 +317,7 @@ class Mysql implements ConnectorInterface
     public function table($table)
     {
         $this->_table = self::_backquote($table);
-        
+
         return $this;
     }
 
@@ -871,4 +871,41 @@ class Mysql implements ConnectorInterface
             }
         }
     }
+
+    public function beginTrans()
+    {
+        try {
+            return $this->_pdo->beginTransaction();
+        } catch (PDOException $e) {
+            // when time out, reconnect
+            if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
+
+                $this->_closeConnection();
+                $this->_connect();
+
+                try {
+                    return $this->_pdo->beginTransaction();
+                } catch (PDOException $e) {
+                    throw $e;
+                }
+
+            } else {
+                throw $e;
+            }
+        }
+    }
+
+    public function commitTrans()
+    {
+        return $this->_pdo->commit();
+    }
+
+    public function rollBackTrans()
+    {
+        if ($this->_pdo->inTransaction()) {
+            // if transaction already started, roll back
+            return $this->_pdo->rollBack();
+        }
+    }
+
 }

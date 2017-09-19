@@ -42,7 +42,7 @@ class TestController extends Controller {
                   $query->table('ad_promote_info')
                         ->select('id')->where('id', '<', '10');
              })
-             ->orderBy('id', 'DEsSC')
+             ->orderBy('id', 'DESC')
              ->get();
 
         // $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
