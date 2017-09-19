@@ -3,6 +3,7 @@ namespace Framework\DB\Drivers;
 use PDO;
 use PDOException;
 use Closure;
+
 /**
  * Mysql Driver
  *
@@ -10,16 +11,32 @@ use Closure;
  */
 class Mysql implements ConnectorInterface
 {
-
+    /**
+     * PDO instance
+     *
+     * @var \PDO
+     */
     private $_pdo = NULL;
+
     /**
      * PDOStatement instance
      *
      * @var \PDOStatement
      */
     private $_pdoSt = NULL;
+
+    /**
+     * PDO connect config
+     *
+     * @var Array
+     */
     private $_config = [];
 
+    /**
+     * build attribute list
+     *
+     * @var Array
+     */
     private $_buildAttrs = [
       '_table',
       '_query_sql',
@@ -32,22 +49,102 @@ class Mysql implements ConnectorInterface
       '_limit_str',
     ];
 
+    /**
+     * table name
+     *
+     * @var String
+     */
     private $_table = '';
+
+    /**
+     * sql sting
+     *
+     * @var String
+     */
     private $_query_sql = '';
 
+    /**
+     * sql sting
+     *
+     * @var String
+     */
     private $_cols_str = ' * ';
+
+    /**
+     * where sting
+     *
+     * @var String
+     */
     private $_where_str = '';
+
+    /**
+     * orderby sting
+     *
+     * @var String
+     */
     private $_orderby_str = '';
+
+    /**
+     * groupby sting
+     *
+     * @var String
+     */
     private $_groupby_str = '';
+
+    /**
+     * having sting
+     *
+     * @var String
+     */
     private $_having_str = '';
+
+    /**
+     * join sting
+     *
+     * @var String
+     */
     private $_join_str = '';
+
+    /**
+     * limit sting
+     *
+     * @var String
+     */
     private $_limit_str = '';
 
+    /**
+     * insert sting
+     *
+     * @var String
+     */
     private $_insert_str = '';
+
+    /**
+     * update sting
+     *
+     * @var String
+     */
     private $_update_str = '';
 
+    /**
+     * bind params list
+     *
+     * @var Array
+     */
     private $_bind_params = [];
 
+    /**
+     * construct , create a db connection
+     *
+     * @param string $host
+     * @param string $port
+     * @param string $user
+     * @param string $password
+     * @param string $dbname
+     * @param string $charset
+     * @return  void
+     * @throws  \PDOException
+     */
     public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8')
     {
         $this->_config = [
@@ -61,6 +158,12 @@ class Mysql implements ConnectorInterface
         $this->_connect();
     }
 
+    /**
+     * create a PDO instance
+     *
+     * @return  void
+     * @throws  \PDOException
+     */
     private function _connect()
     {
         $dsn = 'mysql:dbname='.$this->_config['dbname'].
@@ -84,13 +187,22 @@ class Mysql implements ConnectorInterface
         }
     }
 
+    /**
+     * close a db connection
+     *
+     * @return  void
+     */
     private function _closeConnection()
     {
         $this->_pdo = NULL;
     }
 
-
-    // memory-resident mode , need manual reset attr
+    /**
+     * reset all attribute
+     * memory-resident mode , need manual reset attr
+     *
+     * @return  void
+     */
     private function _reset()
     {
         $this->_table = '';
@@ -107,7 +219,12 @@ class Mysql implements ConnectorInterface
         $this->_bind_params = [];
     }
 
-    private function _resetBuildStr()
+    /**
+     * reset build attr
+     *
+     * @return  void
+     */
+    private function _resetBuildAttr()
     {
         $this->_table = '';
         $this->_query_sql = '';
@@ -120,6 +237,11 @@ class Mysql implements ConnectorInterface
         $this->_limit_str = '';
     }
 
+    /**
+     * build query sql
+     *
+     * @return  void
+     */
     private function _buildQuery()
     {
         $this->_query_sql = 'SELECT '.$this->_cols_str.' '.' FROM '.$this->_table.
@@ -130,21 +252,42 @@ class Mysql implements ConnectorInterface
             $this->_limit_str;
     }
 
+    /**
+     * build insert sql
+     *
+     * @return  void
+     */
     private function _buildInsert()
     {
         $this->_query_sql = 'INSERT INTO '.$this->_table.$this->_insert_str;
     }
 
+    /**
+     * build update sql
+     *
+     * @return  void
+     */
     private function _buildUpdate()
     {
         $this->_query_sql = 'UPDATE '.$this->_table.$this->_update_str.$this->_where_str;
     }
 
+    /**
+     * build delete sql
+     *
+     * @return  void
+     */
     private function _buildDelete()
     {
         $this->_query_sql = 'DELETE FROM '.$this->_table.$this->_where_str;
     }
 
+    /**
+     * prepare and execute, if timeout, auto reconnect
+     *
+     * @return  void
+     * @throws  \PDOException
+     */
     private function _execute()
     {
         try {
@@ -176,6 +319,11 @@ class Mysql implements ConnectorInterface
 
     }
 
+    /**
+     * bind all params
+     *
+     * @return  void
+     */
     private function _bindParams()
     {
         if(is_array($this->_bind_params)) {
@@ -185,11 +333,22 @@ class Mysql implements ConnectorInterface
         }
     }
 
+    /**
+     * generate a placeholder
+     *
+     * @return  String
+     */
     private static function _getPlh()
     {
         return ':'.uniqid();
     }
 
+    /**
+     * add '`' symbol to field, support alias mode, prefix mode, func mode
+     *
+     * @param  String $str
+     * @return  String
+     */
     private static function _backquote($str)
     {
         // match pattern
@@ -219,6 +378,16 @@ class Mysql implements ConnectorInterface
         return '`'.$str.'`';
     }
 
+    /**
+     * parse argurment, create build attr, store bind param
+     *
+     * @param  Int $args_num
+     * @param  Array $params
+     * @param  String $operator
+     * @param  String &$construct_str
+     * @return  void
+     * @throws  \InvalidArgumentException
+     */
     private function _condition_constructor($args_num, $params, $operator, &$construct_str)
     {
         // params dose not conform to specification
@@ -258,7 +427,12 @@ class Mysql implements ConnectorInterface
         }
     }
 
-    private function _storeAttr()
+    /**
+     * store build attr to tmp
+     *
+     * @return  Array
+     */
+    private function _storeBuildAttr()
     {
         // attribute need to store
         $store = [];
@@ -270,31 +444,56 @@ class Mysql implements ConnectorInterface
         return $store;
     }
 
-    private function _reStoreAttr(Array $data)
+    /**
+     * restore build attr from tmp
+     *
+     * @param  Array $data
+     * @return  void
+     */
+    private function _reStoreBuildAttr(Array $data)
     {
         foreach ($this->_buildAttrs as $buildAttr) {
             $this->$buildAttr = $data[ltrim($buildAttr, '_')];
         }
     }
 
+    /**
+     * store bind params to tmp
+     *
+     * @return  Array
+     */
     private function _storeBindParam()
     {
         return $this->_bind_params;
     }
 
+    /**
+     * restore bind params from tmp
+     *
+     * @param  Array $data
+     * @return  void
+     */
     private function _reStoreBindParam($bind_params)
     {
         $this->_bind_params = $bind_params;
     }
 
+    /**
+     * do sub build
+     *
+     * @param  \Closure $callback
+     * @return  Array
+     * @throws  \InvalidArgumentException
+     * @throws  \PDOException
+     */
     private function _subBuilder(Closure $callback)
     {
         // store build attr
-        $store = $this->_storeAttr();
+        $store = $this->_storeBuildAttr();
 
         /**************** begin sub query build ****************/
             // empty attribute
-            $this->_resetBuildStr();
+            $this->_resetBuildAttr();
             // call sub query callback
             call_user_func($callback, $this);
             // get sub query build attr
@@ -308,12 +507,17 @@ class Mysql implements ConnectorInterface
         /**************** end sub query build ****************/
 
         // restore attribute
-        $this->_reStoreAttr($store);
+        $this->_reStoreBuildAttr($store);
 
         return $sub_attr;
     }
 
-
+    /**
+     * set table
+     *
+     * @param  String $table
+     * @return  self
+     */
     public function table($table)
     {
         $this->_table = self::_backquote($table);
@@ -321,6 +525,11 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * set select cols
+     *
+     * @return  self
+     */
     public function select()
     {
         $cols = func_get_args();
@@ -340,7 +549,11 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
-
+    /**
+     * build where string
+     *
+     * @return  self
+     */
     public function where()
     {
         $operator = 'AND';
@@ -356,6 +569,11 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build orWhere string
+     *
+     * @return  self
+     */
     public function orWhere()
     {
         $operator = 'OR';
@@ -371,6 +589,16 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build whereIn string
+     *
+     * @param  String $field
+     * @param  Array $data
+     * @param  String $condition
+     * @param  String $operator
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereIn($field, Array $data, $condition = 'IN', $operator = 'AND')
     {
         if( ! in_array($condition, ['IN', 'NOT IN']) || ! in_array($operator, ['AND', 'OR'])) {
@@ -392,21 +620,55 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build orWhereIn string
+     *
+     * @param  String $field
+     * @param  Array $data
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereIn($field, Array $data)
     {
         return $this->whereIn($field, $data, 'IN', 'OR');
     }
 
+    /**
+     * build whereNotIn string
+     *
+     * @param  String $field
+     * @param  Array $data
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereNotIn($field, Array $data)
     {
         return $this->whereIn($field, $data, 'NOT IN', 'AND');
     }
 
+    /**
+     * build orWhereNotIn string
+     *
+     * @param  String $field
+     * @param  Array $data
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereNotIn($field, Array $data)
     {
         return $this->whereIn($field, $data, 'NOT IN', 'OR');
     }
 
+    /**
+     * build whereBetween string
+     *
+     * @param  String $field
+     * @param  Int $start
+     * @param  Int $end
+     * @param  String $operator
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereBetween($field, $start, $end, $operator = 'AND')
     {
         if( ! in_array($operator, ['AND', 'OR'])) {
@@ -428,11 +690,29 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build orWhereBetween string
+     *
+     * @param  String $field
+     * @param  Int $start
+     * @param  Int $end
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereBetween($field, $start, $end)
     {
         return $this->whereBetween($field, $start, $end, 'OR');
     }
 
+    /**
+     * build whereNull string
+     *
+     * @param  String $field
+     * @param  String $condition
+     * @param  String $operator
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereNull($field, $condition = 'NULL', $operator = 'AND')
     {
         if( ! in_array($operator, ['AND', 'OR'])) {
@@ -450,16 +730,37 @@ class Mysql implements ConnectorInterface
         return $this;
     }
 
+    /**
+     * build whereNotNull string
+     *
+     * @param  String $field
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function whereNotNull($field)
     {
         return $this->whereNull($field, 'NOT NULL', 'AND');
     }
 
+    /**
+     * build orWhereNull string
+     *
+     * @param  String $field
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereNull($field)
     {
         return $this->whereNull($field, 'NULL', 'OR');
     }
 
+    /**
+     * build orWhereNotNull string
+     *
+     * @param  String $field
+     * @return  self
+     * @throws  \InvalidArgumentException
+     */
     public function orWhereNotNull($field)
     {
         return $this->whereNull($field, 'NOT NULL', 'OR');
@@ -653,12 +954,12 @@ class Mysql implements ConnectorInterface
     public function paginate($step, $page = NULL)
     {
         // store build attr\bind param
-        $store = $this->_storeAttr();
+        $store = $this->_storeBuildAttr();
         $bind_params = $this->_storeBindParam();
         // get count
         $count = $this->count();
         // restore build attr\bind param
-        $this->_reStoreAttr($store);
+        $this->_reStoreBuildAttr($store);
         $this->_reStoreBindParam($bind_params);
 
         // create paginate data
