@@ -344,7 +344,7 @@ class Mysql implements ConnectorInterface
     }
 
     /**
-     * add '`' symbol to field, support alias mode, prefix mode, func mode
+     * add backquote sto field, support alias mode, prefix mode, func mode
      *
      * @param  String $str
      * @return  String
@@ -406,8 +406,8 @@ class Mysql implements ConnectorInterface
                   $construct_str .= ' '.self::_backquote($field).' = '.$plh.' '.$operator;
                   $this->_bind_params[$plh] = $value;
               }
-              // 想想有没有更好的处理方案
-              $construct_str = rtrim($construct_str, $operator);
+              // remove last operator
+              $construct_str = substr($construct_str, 0, strrpos($construct_str, $operator));
               break;
           // ('a', 10) : a = 10 mode
           case 2:
@@ -563,7 +563,7 @@ class Mysql implements ConnectorInterface
         } else {
             $this->_where_str .= ' '.$operator.' ';
         }
-
+        // build attribute, bind params
         $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_where_str);
 
         return $this;
@@ -583,7 +583,7 @@ class Mysql implements ConnectorInterface
         } else {
             $this->_where_str .= ' '.$operator.' ';
         }
-
+        // build attribute, bind params
         $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_where_str);
 
         return $this;
@@ -968,7 +968,7 @@ class Mysql implements ConnectorInterface
         } else {
             $this->_having_str .= ' '.$operator.' ';
         }
-
+        // build attribute, bind params
         $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_having_str);
 
         return $this;
@@ -989,7 +989,7 @@ class Mysql implements ConnectorInterface
         } else {
             $this->_having_str .= ' '.$operator.' ';
         }
-
+        // build attribute, bind params
         $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_having_str);
 
         return $this;

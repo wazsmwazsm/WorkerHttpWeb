@@ -20,6 +20,13 @@ class TestController extends Controller {
         //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
 
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+             ->where([
+               'adId' => '001-001',
+               'adStyle' => 'big_ad',
+             ])
+             ->get();
+
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //      ->where('id', '<', 10)
         //      ->orWhereBrackets(function($query) {
@@ -37,13 +44,13 @@ class TestController extends Controller {
         //      ->whereNull('adStyle')
         //      ->whereNotNull('package_name')
         //      ->get();
-        $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->whereInSub('id', function($query) {
-                  $query->table('ad_promote_info')
-                        ->select('id')->where('id', '<', '10');
-             })
-             ->orderBy('id', 'DESC')
-             ->get();
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        //      ->whereInSub('id', function($query) {
+        //           $query->table('ad_promote_info')
+        //                 ->select('id')->where('id', '<', '10');
+        //      })
+        //      ->orderBy('id', 'DESC')
+        //      ->get();
 
         // $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
         //   $query->table('ad_promote_info')->where('id', '<', '100');
