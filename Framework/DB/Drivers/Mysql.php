@@ -1137,7 +1137,7 @@ class Mysql implements ConnectorInterface
 
         $rst['total']        = $count;
         $rst['per_page']     = $step;
-        $rst['current_page'] = $page;var_dump($count / $step);
+        $rst['current_page'] = $page;
         $rst['next_page']    = ($page + 1) > ($count / $step) ? NULL : ($page + 1);
         $rst['prev_page']    = ($page - 1) < 1 ? NULL : ($page - 1);
         $rst['first_page']   = 1;
