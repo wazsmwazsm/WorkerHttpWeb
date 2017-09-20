@@ -385,7 +385,7 @@ class Mysql implements ConnectorInterface
         if(preg_match($prefix_pattern, $str)) {
             return preg_replace($prefix_pattern, $prefix_replace, $str);
         }
-        // mysql fun mode
+        // func mode
         if(preg_match($func_pattern, $str)) {
             return $str;
         }
