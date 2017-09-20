@@ -30,13 +30,13 @@ class Route {
      * @param  string  $method
      * @param  mixed  $params
      * @return void
-     * @throws \LogicException run out of worker container, not catch, just crash
+     * @throws \InvalidArgumentException run out of worker container, not catch, just crash
      */
     public static function __callstatic($method, $params) {
         // $param check
         if(count($params) !== 2) {
             // not catch, trigger Fatal error
-            throw new \LogicException("method $method accept 2 params!");
+            throw new \InvalidArgumentException("method $method accept 2 params!");
         }
         // create map tree, exp: $_map_tree['/a/b']['get'] = 'controller@method'
         $uri      = self::_uriParse(self::$_filter['prefix'].$params[0]);
@@ -106,9 +106,9 @@ class Route {
         // get request param
         $uri = self::_uriParse(parse_url(($request->server->REQUEST_URI))['path']);
         $method = $request->server->REQUEST_METHOD;
-        // 查找路由规则是否存在
+        // router exist or not
         if( ! isset(self::$_map_tree[$uri][$method])) {
-            throw new \LogicException("route rule uri: $uri <==> method : $method is not set!");
+            throw new \LogicException("route rule uri: $uri <==> method : $method is not set!", 404);
         }
         // get callback info
         $callback = self::$_map_tree[$uri][$method];
@@ -124,7 +124,7 @@ class Route {
             list($class, $method) = [$controller[0], $controller[1]];
             // class methods exist ?
             if( ! class_exists($class) || ! method_exists($class, $method)) {
-                throw new \BadMethodCallException("Class@method: $callback is not found!");
+                throw new \BadMethodCallException("Class@method: $callback is not found!", 404);
             }
             // call method
             return call_user_func([(new $class), $method], $request);

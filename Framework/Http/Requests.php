@@ -6,7 +6,8 @@ namespace Framework\Http;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-Class Requests {
+Class Requests
+{
     /**
      * get param.
      *
@@ -49,7 +50,8 @@ Class Requests {
      *
      * @param Array $request
      */
-    public function __construct(Array $request) {
+    public function __construct(Array $request)
+    {
         $this->get     = (object) $request['get'];
         $this->post    = (object) $request['post'];
         $this->requset = (object) array_merge($request['get'], $request['post']);
@@ -64,7 +66,8 @@ Class Requests {
      * @param  string  $key
      * @return mixed
      */
-    public function __get($key) {
+    public function __get($key)
+    {
         if (array_key_exists($key, $this->requset)) {
             return $this->requset->$key;
         }

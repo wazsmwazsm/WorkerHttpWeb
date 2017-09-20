@@ -6,7 +6,8 @@ namespace Framework;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-class Config {
+class Config
+{
 
     /**
      * config.
@@ -22,7 +23,8 @@ class Config {
      * @param  string  $conf
      * @return void
      */
-    public static function set($file, $conf) {
+    public static function set($file, $conf)
+    {
 
         self::$_config[$file] = $conf;
     }
@@ -33,7 +35,8 @@ class Config {
      * @param  String  $key
      * @return mixed
      */
-    public static function get($key) {
+    public static function get($key)
+    {
 
         $path = explode('.', $key);
         list($file, $conf) = [$path[0], $path[1]];
@@ -46,7 +49,8 @@ class Config {
      *
      * @return String
      */
-    public static function getRootPath() {
+    public static function getRootPath()
+    {
 
         return getcwd();
     }

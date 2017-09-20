@@ -1,13 +1,13 @@
 <?php
 namespace Framework;
 use Framework\Config;
-use Framework\Http\Response;
 /**
  * Error.
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-class Error {
+class Error
+{
 
     /**
      * response html.
@@ -16,7 +16,7 @@ class Error {
      */
     private static $_html_blade = '<html><head><title>{{title}}</title><style>'.
         'body{width:35em;margin:0 auto;font-family:Tahoma,Verdana,Arial,sans-serif}</style>'.
-        '</head><body><center><h1>{{httpcode}}</h1><h3>{{exception}}</h3></center></body></html>';
+        '</head><body><center><h1>{{header}}</h1><div style="text-align:left;line-height:22px">{{exception}}</div></center></body></html>';
 
     /**
      * print error.
@@ -24,8 +24,9 @@ class Error {
      * @param  \Exception $e
      * @return void
      */
-    public static function printError(\Exception $e) {
-        echo $e->getMessage()."\n";
+    public static function printError(\Exception $e)
+    {
+        echo $e;
     }
 
     /**
@@ -35,17 +36,18 @@ class Error {
      * @param  int $code
      * @return String
      */
-    public static function errorHtml(\Exception $e, $code) {
+    public static function errorHtml(\Exception $e, $header)
+    {
 
         $pattern = [
             '/\{\{title\}\}/',
-            '/\{\{httpcode\}\}/',
+            '/\{\{header\}\}/',
             '/\{\{exception\}\}/',
         ];
 
-        $title = $httpcode = 'HTTP '.$code.' '.Response::getHttpStatus($code);
-        $exception = Config::get('app.debug') ? $e->getMessage() : 'something error...';
-        $replacement = [$title, $httpcode, $exception];
+        $title = $header;
+        $exception = Config::get('app.debug') ? $e : 'something error...';
+        $replacement = [$title, $header, $exception];
 
         return preg_replace($pattern, $replacement, self::$_html_blade);
     }

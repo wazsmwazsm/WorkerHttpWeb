@@ -1,8 +1,10 @@
 <?php
 namespace Framework;
 
-class Controller {
-    public function __contruct() {
+class Controller
+{
+    public function __contruct()
+    {
 
     }
 }

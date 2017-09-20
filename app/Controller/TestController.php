@@ -5,8 +5,10 @@ use Framework\Controller;
 use Framework\DB\DB;
 
 
-class TestController extends Controller {
-    public function test($request) {
+class TestController extends Controller
+{
+    public function test($request)
+    {
         // $rst = DB::$connection['con1']->query('select * from ad_promote_info limit 0, 30');
 
 
@@ -20,20 +22,20 @@ class TestController extends Controller {
         //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
 
-        $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->where([
-               'adId' => '001-001',
-               'adStyle' => 'big_ad',
-             ])
-             ->get();
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
-        //      ->where('id', '<', 10)
-        //      ->orWhereBrackets(function($query) {
-        //         $query->where('adId', '001-001')
-        //               ->orWhere('adId', '001-003');
-        //      })
-        //      ->orderBy('id', 'DESC')
+        //      ->where([
+        //        'adId' => '001-001',
+        //        'adStyle' => 'big_ad',
+        //      ])
         //      ->get();
+        $rst = DB::$connection['con2']->table('ad_promote_collect')
+             ->where('id', '<', 10)
+             ->orWhereBrackets(function($query) {
+                $query->where('adId', '001-001')
+                      ->orWhere('adId', '001-003');
+             })
+             ->orderBy('id', 'DESC')
+             ->get();
 
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //       ->list('id');

@@ -11,7 +11,8 @@ use Framework\DB\DB;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-class App {
+class App
+{
     /**
      * run http app.
      *
@@ -21,28 +22,24 @@ class App {
      * @throws \LogicException
      * @throws \BadMethodCallException
      * @throws \InvalidArgumentException
+     * @throws \PDOException
      */
-    public static function run(TcpConnection $con, $data) {
+    public static function run(TcpConnection $con, $data)
+    {
         try {
             // dispatch route, return Response data
             $response = Response::bulid(Route::dispatch(new Requests($data)));
-
             $con->send($response);
+            
+        } catch (\Exception $e) {
+            // create http response header
+            $eCode = $e->getCode() == 0 ? 500 : $e->getCode();
+            $header = 'HTTP/1.1 '.$eCode.' '.Response::getHttpStatus($eCode);
+            Response::header($header);
 
-        } catch (\LogicException $e) {
+            // show error
             Error::printError($e);
-            Response::header("HTTP/1.1 404 Not Found");
-            $con->close(Error::errorHtml($e, 404));
-
-        } catch (\BadMethodCallException $e) {
-            Error::printError($e);
-            Response::header("HTTP/1.1 500 Internal Server Error");
-            $con->close(Error::errorHtml($e, 500));
-
-        } catch (\InvalidArgumentException $e) {
-            Error::printError($e);
-            Response::header("HTTP/1.1 500 Internal Server Error");
-            $con->close(Error::errorHtml($e, 500));
+            $con->send(Error::errorHtml($e, $header));
         }
 
     }
@@ -52,7 +49,8 @@ class App {
      *
      * @return void
      */
-    public static function dbInit() {
+    public static function dbInit()
+    {
         // init database
         DB::init();
     }

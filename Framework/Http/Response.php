@@ -11,7 +11,8 @@ use Framework\Config;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-Class Response {
+Class Response
+{
 
     /**
      * create http response header.
@@ -19,7 +20,8 @@ Class Response {
      * @param  mixed  $header
      * @return void
      */
-    public static function header($headers) {
+    public static function header($headers)
+    {
 
         if(is_array($headers)) {
             // if pass array
@@ -38,7 +40,8 @@ Class Response {
      * @param  int  $code
      * @return String
      */
-    public static function getHttpStatus($code) {
+    public static function getHttpStatus($code)
+    {
 
         return HttpCache::$codes[$code];
     }
@@ -50,7 +53,8 @@ Class Response {
      * @return String
      * @throws \InvalidArgumentException
      */
-    public static function bulid($data) {
+    public static function bulid($data)
+    {
         // should be json
         if(is_array($data) || is_object($data)) {
             Http::header("Content-Type: application/json;charset=utf-8");
@@ -70,7 +74,8 @@ Class Response {
      * @param  string  $data
      * @return string
      */
-    private static function _compress($data) {
+    private static function _compress($data)
+    {
 
         $compress_data = $data;
         // get accept encodeing from request

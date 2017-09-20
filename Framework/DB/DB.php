@@ -7,7 +7,8 @@ use Framework\DB\Drivers\Mysql;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-class DB {
+class DB
+{
     /**
      * connections.
      *
@@ -20,7 +21,8 @@ class DB {
      *
      * @return void
      */
-    public static function init() {
+    public static function init()
+    {
         // get db config
         $db_confs = Config::get('database.connection');
         // connect database
