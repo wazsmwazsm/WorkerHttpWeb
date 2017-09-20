@@ -1,5 +1,5 @@
 <?php
-namespace Framework;
+namespace Framework\Http;
 use Framework\Http\Requests;
 use Closure;
 /**

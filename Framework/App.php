@@ -3,7 +3,7 @@ namespace Framework;
 use Workerman\Connection\TcpConnection;
 use Framework\Http\Requests;
 use Framework\Http\Response;
-use Framework\Route;
+use Framework\Http\Route;
 use Framework\Error;
 use Framework\DB\DB;
 /**
@@ -30,7 +30,7 @@ class App
             // dispatch route, return Response data
             $response = Response::bulid(Route::dispatch(new Requests($data)));
             $con->send($response);
-            
+
         } catch (\Exception $e) {
             // create http response header
             $eCode = $e->getCode() == 0 ? 500 : $e->getCode();

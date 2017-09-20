@@ -1,5 +1,5 @@
 <?php
-use Framework\Route;
+use Framework\Http\Route;
 
 Route::get('/a/b', function() {
     echo 'a';

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller;
-use Framework\Controller;
+use Framework\Http\Controller;
 use Framework\DB\DB;
 
 
