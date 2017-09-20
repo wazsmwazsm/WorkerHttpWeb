@@ -37,8 +37,8 @@ class App
             $header = 'HTTP/1.1 '.$eCode.' '.Response::getHttpStatus($eCode);
             Response::header($header);
 
-            // show error
-            Error::printError($e);
+            // show error, if 404 only return http response 
+            if($eCode == 500) Error::printError($e);
             $con->send(Error::errorHtml($e, $header));
         }
 

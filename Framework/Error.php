@@ -26,7 +26,7 @@ class Error
      */
     public static function printError(\Exception $e)
     {
-        echo $e;
+        echo '['.date('Y-m-d H:i:s', time()).']'."\n".$e."\n";
     }
 
     /**
@@ -38,7 +38,6 @@ class Error
      */
     public static function errorHtml(\Exception $e, $header)
     {
-
         $pattern = [
             '/\{\{title\}\}/',
             '/\{\{header\}\}/',
