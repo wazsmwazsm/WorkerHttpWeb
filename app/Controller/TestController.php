@@ -26,7 +26,6 @@ class TestController extends Controller {
                'adStyle' => 'big_ad',
              ])
              ->get();
-
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //      ->where('id', '<', 10)
         //      ->orWhereBrackets(function($query) {
@@ -58,7 +57,9 @@ class TestController extends Controller {
         // ->orderBy('id', 'ASC')
         // ->paginate(10, $request->page);
 
-        // $rst = DB::$connection['con2']->table('ad_promote_collect')->insert([
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        // ->withDebug()
+        // ->insert([
         //   'package_name' => 'aa',
         //   'adId' => '007-008',
         //   'adStyle' => 'big_ad',
@@ -70,7 +71,7 @@ class TestController extends Controller {
 
 
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
-        // ->where('package_name', 'aa')
+        // ->where('package_name', 'aa')->withDebug()
         // ->update([
         //   'impression' => 20,
         //   'click' => 10,

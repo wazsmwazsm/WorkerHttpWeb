@@ -26,6 +26,13 @@ class Mysql implements ConnectorInterface
     private $_pdoSt = NULL;
 
     /**
+     * debug, set TRUE dump debug info to stdout
+     *
+     * @var Boolean
+     */
+    private $_debug = FALSE;
+
+    /**
      * PDO connect config
      *
      * @var Array
@@ -295,7 +302,11 @@ class Mysql implements ConnectorInterface
             $this->_bindParams();
             $this->_reset();  // memory-resident mode, singleton pattern, need reset build attr
             $this->_pdoSt->execute();
-
+            // if debug mode, print sql and bind params to stdout
+            if($this->_debug) {
+                $this->_pdoSt->debugDumpParams();
+                $this->_debug = FALSE; // close debug
+            }
         } catch (PDOException $e) {
             // when time out, reconnect
             if($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
@@ -307,7 +318,11 @@ class Mysql implements ConnectorInterface
                     $this->_bindParams();
                     $this->_reset();
                     $this->_pdoSt->execute();
-
+                    // if debug mode, print sql and bind params to stdout
+                    if($this->_debug) {
+                        $this->_pdoSt->debugDumpParams();
+                        $this->_debug = FALSE; // close debug
+                    }
                 } catch (PDOException $e) {
                     throw $e;
                 }
@@ -1329,6 +1344,18 @@ class Mysql implements ConnectorInterface
         $this->_execute();
 
         return $this->_pdoSt->rowCount();
+    }
+
+    /**
+     * set debug to TRUE
+     *
+     * @return  self
+     */
+    public function withDebug()
+    {
+        $this->_debug = TRUE;
+
+        return $this;
     }
 
     /**
