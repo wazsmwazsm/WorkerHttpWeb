@@ -10,6 +10,7 @@ Worker::$logFile = './tmp/log/workerman.log';
 
 $http_worker = new Worker('http://0.0.0.0:600');
 $http_worker->count = 4;
+$http_worker->user = 'www-data';
 
 $http_worker->onWorkerStart = function($http_worker) {
     // init db connection
