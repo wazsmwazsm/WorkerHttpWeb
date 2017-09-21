@@ -32,7 +32,8 @@ class Route {
      * @return void
      * @throws \InvalidArgumentException run out of worker container, not catch, just crash
      */
-    public static function __callstatic($method, $params) {
+    public static function __callstatic($method, $params)
+    {
         // $param check
         if(count($params) !== 2) {
             // not catch, trigger Fatal error
@@ -53,7 +54,8 @@ class Route {
      * @param  \Closure  $routes
      * @return void
      */
-    public static function group(Array $filter, Closure $routes) {
+    public static function group(Array $filter, Closure $routes)
+    {
         // set filter uri prefix
         if(isset($filter['prefix'])) {
             self::$_filter['prefix'] = '/'.$filter['prefix'].'/';
@@ -75,7 +77,8 @@ class Route {
      * @param  String  $uri
      * @return String
      */
-    private static function _uriParse($uri) {
+    private static function _uriParse($uri)
+    {
         // make uri as /a/b/c mode
         $uri = ($uri == '/') ? $uri : '/'.rtrim($uri, '/');
         $uri = preg_replace('/\/+/', '/', $uri);
@@ -89,7 +92,8 @@ class Route {
      * @param  String  $namespace
      * @return String
      */
-    private static function _namespaceParse($namespace) {
+    private static function _namespaceParse($namespace)
+    {
         // make namespace as \a\b\c mode
         // why 4 '\' ? see php document preg_replace
         return preg_replace('/\\\\+/', '\\\\', $namespace);
@@ -102,7 +106,8 @@ class Route {
      * @throws \LogicException
      * @throws \BadMethodCallException
      */
-    public static function dispatch(Requests $request) {
+    public static function dispatch(Requests $request)
+    {
         // get request param
         $uri = self::_uriParse(parse_url(($request->server->REQUEST_URI))['path']);
         $method = $request->server->REQUEST_METHOD;
