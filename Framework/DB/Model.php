@@ -31,7 +31,7 @@ class Model
         } else {
             $instance = new static;
         }
-        $db = DB::$connection[$this->connection]->table($this->table);
+        $db = DB::$connection[$instance->connection]->table($instance->table);
         // improve the efficiency
         switch (count($params)) {
             case 0:
@@ -48,7 +48,7 @@ class Model
                 return call_user_func_array([$db, $method], $params);
         }
     }
-    
+
     public function __call($method, $params)
     {
         $db = DB::$connection[$this->connection]->table($this->table);

@@ -1,6 +1,7 @@
 <?php
 namespace Framework\Http;
 use Framework\Http\Requests;
+use Framework\DI;
 use Closure;
 /**
  * HTTP router.
@@ -132,7 +133,7 @@ class Route {
                 throw new \BadMethodCallException("Class@method: $callback is not found!", 404);
             }
             // call method
-            return call_user_func([(new $class), $method], $request);
+            return DI::run($class, $method);
         }
         // is callback
         if(is_callable($callback)) {

@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 use Framework\Http\Controller;
+use Framework\Http\Requests;
 use Framework\DB\DB;
 use App\Models\Test;
 
 class TestController extends Controller
 {
-    public function test($request)
+
+    public function test(Test $model)
     {
         // $rst = DB::$connection['con1']->query('select * from ad_promote_info limit 0, 30');
 
@@ -43,8 +45,7 @@ class TestController extends Controller
         //       'adStyle' => 'big_ad',
         //     ])
         //     ->get();
-        $model =    Test::getInstance();
-        $rst = $model->where([
+        $rst = Test::where([
               'adId' => '001-001',
               'adStyle' => 'big_ad',
             ])->orderBy('id', 'DESC')
