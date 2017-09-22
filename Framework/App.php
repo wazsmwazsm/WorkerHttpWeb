@@ -33,12 +33,18 @@ class App
 
         } catch (\Exception $e) {
             // create http response header
-            $eCode = $e->getCode() == 0 ? 500 : $e->getCode();
-            $header = 'HTTP/1.1 '.$eCode.' '.Response::getHttpStatus($eCode);
-            Response::header($header);
+            switch ($e->getCode()) {
+                case 404:
+                    $header = 'HTTP/1.1 404 Not Found';
+                    break;
 
-            // show error, if 404 only return http response 
-            if($eCode == 500) Error::printError($e);
+                default:
+                    $header = 'HTTP/1.1 500 Internal Server Error';
+                    Error::printError($e); // if Server error, echo to stdout
+                    break;
+            }
+
+            Response::header($header);
             $con->send(Error::errorHtml($e, $header));
         }
 

@@ -3,7 +3,7 @@
 namespace App\Controller;
 use Framework\Http\Controller;
 use Framework\DB\DB;
-
+use App\Models\Test;
 
 class TestController extends Controller
 {
@@ -28,14 +28,27 @@ class TestController extends Controller
         //        'adStyle' => 'big_ad',
         //      ])
         //      ->get();
-        $rst = DB::$connection['con2']->table('ad_promote_collect')
-             ->where('id', '<', 10)
-             ->orWhereBrackets(function($query) {
-                $query->where('adId', '001-001')
-                      ->orWhere('adId', '001-003');
-             })
-             ->orderBy('id', 'DESC')
-             ->get();
+        // $rst = DB::$connection['con2']->table('ad_promote_collect')
+        //      ->where('id', '<', 10)
+        //      ->orWhereBrackets(function($query) {
+        //         $query->where('adId', '001-001')
+        //               ->orWhere('adId', '001-003');
+        //      })
+        //      ->orderBy('id', 'DESC')
+        //      ->get();
+
+
+        // $rst = Test::where([
+        //       'adId' => '001-001',
+        //       'adStyle' => 'big_ad',
+        //     ])
+        //     ->get();
+        $model =    Test::getInstance();
+        $rst = $model->where([
+              'adId' => '001-001',
+              'adStyle' => 'big_ad',
+            ])->orderBy('id', 'DESC')
+            ->get();
 
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //       ->list('id');

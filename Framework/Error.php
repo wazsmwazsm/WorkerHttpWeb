@@ -33,7 +33,7 @@ class Error
      * return error html.
      *
      * @param  \Exception $e
-     * @param  int $code
+     * @param  int $header
      * @return String
      */
     public static function errorHtml(\Exception $e, $header)
