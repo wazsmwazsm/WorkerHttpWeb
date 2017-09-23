@@ -19,7 +19,7 @@ $http_worker->onWorkerStart = function($http_worker) {
 
 $http_worker->onMessage = function($con, $data) {
     // run web app
-    App::run($con, $data);
+    App::run($con);
 };
 
 Worker::runAll();

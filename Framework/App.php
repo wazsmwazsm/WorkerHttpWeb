@@ -17,18 +17,17 @@ class App
      * run http app.
      *
      * @param  Workerman\Connection\TcpConnection $con
-     * @param  mixed  $data
      * @return void
      * @throws \LogicException
      * @throws \BadMethodCallException
      * @throws \InvalidArgumentException
      * @throws \PDOException
      */
-    public static function run(TcpConnection $con, $data)
+    public static function run(TcpConnection $con)
     {
         try {
             // dispatch route, return Response data
-            $response = Response::bulid(Route::dispatch(new Requests($data)));
+            $response = Response::bulid(Route::dispatch(new Requests()));
             $con->send($response);
 
         } catch (\Exception $e) {

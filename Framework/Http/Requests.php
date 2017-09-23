@@ -48,16 +48,15 @@ Class Requests
     /**
      * get http request param.
      *
-     * @param Array $request
      */
-    public function __construct(Array $request)
+    public function __construct()
     {
-        $this->get     = (object) $request['get'];
-        $this->post    = (object) $request['post'];
-        $this->requset = (object) array_merge($request['get'], $request['post']);
-        $this->server  = (object) $request['server'];
-        $this->cookie  = (object) $request['cookie'];
-        $this->files   = (object) $request['files'];
+        $this->get     = (object) $_GET;
+        $this->post    = (object) $_POST;
+        $this->requset = (object) $_REQUEST;
+        $this->server  = (object) $_SERVER;
+        $this->cookie  = (object) $_COOKIE;
+        $this->files   = (object) $_FILES;
     }
 
     /**
