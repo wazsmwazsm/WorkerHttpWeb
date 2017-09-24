@@ -14,23 +14,10 @@ class Model
 
     protected $table;
 
-    protected static $instance;
-
-
-    public static function getInstance() {
-        if( ! static::$instance instanceof static) {
-            static::$instance = new static;
-        }
-        return static::$instance;
-    }
-
     public static function __callStatic($method, $params)
     {
-        if(static::$instance instanceof static) {
-            $instance = static::$instance;
-        } else {
-            $instance = new static;
-        }
+        $instance = new static;
+        
         $db = DB::$connection[$instance->connection]->table($instance->table);
         // improve the efficiency
         switch (count($params)) {

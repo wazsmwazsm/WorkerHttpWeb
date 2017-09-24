@@ -21,9 +21,10 @@ class TestController extends Controller
         //      ->get();
         // $rst = DB::$connection['con1']->table('ad_promote_info')
         //      ->where('id', '<', 10)
-        //      ->orWhereIn('id', [62,22,1,3])
         //      ->get();
-
+       $rst = $model
+              ->where('id', '<', 10)
+              ->get();
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //      ->where([
         //        'adId' => '001-001',
@@ -45,11 +46,11 @@ class TestController extends Controller
         //       'adStyle' => 'big_ad',
         //     ])
         //     ->get();
-        $rst = Test::where([
-              'adId' => '001-001',
-              'adStyle' => 'big_ad',
-            ])->orderBy('id', 'DESC')
-            ->get();
+        // $rst = Test::where([
+        //       'adId' => '001-001',
+        //       'adStyle' => 'big_ad',
+        //     ])->orderBy('id', 'DESC')
+        //     ->get();
 
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //       ->list('id');
