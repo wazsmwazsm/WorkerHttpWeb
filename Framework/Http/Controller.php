@@ -1,9 +1,18 @@
 <?php
 namespace Framework\Http;
 
+/**
+ * DB.
+ *
+ * @author MirQin https://github.com/wazsmwazsm
+ */
 class Controller
 {
-    public function __contruct()
+    /**
+     *  construct.
+     *
+     */
+    public function __construct()
     {
 
     }
