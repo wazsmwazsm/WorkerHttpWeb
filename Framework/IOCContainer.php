@@ -7,7 +7,7 @@ use ReflectionClass;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
- class DI
+ class IOCContainer
  {
       public static function run($class_name, $method)
       {

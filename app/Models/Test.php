@@ -6,7 +6,7 @@ use Framework\DB\Model;
 
 class Test extends Model
 {
-    protected $connection = 'con1';
+    protected $connection = 'con2';
 
-    protected $table = 'ad_promote_info';
+    protected $table = 'ad_promote_collect';
 }

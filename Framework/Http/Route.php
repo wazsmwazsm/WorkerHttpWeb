@@ -1,7 +1,7 @@
 <?php
 namespace Framework\Http;
 use Framework\Http\Requests;
-use Framework\DI;
+use Framework\IOCContainer;
 use Closure;
 /**
  * HTTP router.
@@ -133,7 +133,7 @@ class Route {
                 throw new \BadMethodCallException("Class@method: $callback is not found!", 404);
             }
             // call method
-            return DI::run($class, $method);
+            return IOCContainer::run($class, $method);
         }
         // is callback
         if(is_callable($callback)) {
