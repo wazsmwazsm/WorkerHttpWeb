@@ -23,11 +23,11 @@ use ReflectionClass;
        * @param  \ReflectionClass $reflector
        * @return object
        */
-      private static function getInstance(ReflectionClass $reflector)
+      private static function _getInstance(ReflectionClass $reflector)
       {
           $constructor = $reflector->getConstructor();
           // create di params
-          $di_params = $constructor ? self::getDiParams($constructor->getParameters()) : [];
+          $di_params = $constructor ? self::_getDiParams($constructor->getParameters()) : [];
           // create instance
           return $reflector->newInstanceArgs($di_params);
       }
@@ -38,7 +38,7 @@ use ReflectionClass;
        * @param  Array $params
        * @return Array
        */
-      private static function getDiParams(Array $params)
+      private static function _getDiParams(Array $params)
       {
           $di_params = [];
           foreach ($params as $param) {
@@ -103,11 +103,11 @@ use ReflectionClass;
           // get class reflector
           $reflector = new ReflectionClass($class_name);
           // create instance
-          $instance = self::getInstance($reflector);
+          $instance = self::_getInstance($reflector);
           /******* method Dependency injection *******/
           $reflectorMethod = $reflector->getMethod($method);
           // create di params
-          $di_params = self::getDiParams($reflectorMethod->getParameters());//var_dump(self::$_singleton);
+          $di_params = self::_getDiParams($reflectorMethod->getParameters());//var_dump(self::$_singleton);
           // run method
           return call_user_func_array([$instance, $method], $di_params);
       }

@@ -21,9 +21,9 @@ class TestController extends Controller
         // $rst = DB::connection('con1')->table('ad_promote_info')
         //      ->where('id', '<', 10)
         //      ->get();
-      //  $rst = $model
-      //         ->where('id', '<', 10)
-      //         ->get();
+       $rst = $model
+              ->where('id', '<', 10)
+              ->get();
         // $rst = DB::connection('con2')->table('ad_promote_collect')
         //      ->where([
         //        'adId' => '001-001',
@@ -67,12 +67,12 @@ class TestController extends Controller
         //      ->orderBy('id', 'DESC')
         //      ->get();
 
-         $rst = $model->whereInSub('id', function($query) {
-                   $query->table('ad_promote_info')
-                         ->select('id')->where('id', '<', '100');
-              })
-              ->orderBy('id', 'DESC')
-              ->paginate(10, $request->page);
+        //  $rst = $model->whereInSub('id', function($query) {
+        //            $query->table('ad_promote_info')
+        //                  ->select('id')->where('id', '<', '100');
+        //       })
+        //       ->orderBy('id', 'DESC')
+        //       ->paginate(10, $request->page);
         // $rst = DB::connection('con2')->select('id','adId','adTitle')->fromSub(function($query) {
         //   $query->table('ad_promote_info')->where('id', '<', '100');
         // })->where('id', '!=', 9)
