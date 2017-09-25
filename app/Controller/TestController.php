@@ -8,8 +8,7 @@ use App\Models\Test;
 
 class TestController extends Controller
 {
-
-    public function test(Test $model)
+    public function test(Test $model, Requests $request)
     {
         // $rst = DB::$connection['con1']->query('select * from ad_promote_info limit 0, 30');
 
@@ -22,9 +21,9 @@ class TestController extends Controller
         // $rst = DB::$connection['con1']->table('ad_promote_info')
         //      ->where('id', '<', 10)
         //      ->get();
-       $rst = $model
-              ->where('id', '<', 10)
-              ->get();
+      //  $rst = $model
+      //         ->where('id', '<', 10)
+      //         ->get();
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         //      ->where([
         //        'adId' => '001-001',
@@ -68,11 +67,11 @@ class TestController extends Controller
         //      ->orderBy('id', 'DESC')
         //      ->get();
 
-        // $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
-        //   $query->table('ad_promote_info')->where('id', '<', '100');
-        // })->where('id', '!=', 9)
-        // ->orderBy('id', 'ASC')
-        // ->paginate(10, $request->page);
+        $rst = DB::$connection['con2']->select('id','adId','adTitle')->fromSub(function($query) {
+          $query->table('ad_promote_info')->where('id', '<', '100');
+        })->where('id', '!=', 9)
+        ->orderBy('id', 'ASC')
+        ->paginate(10, $request->page);
 
         // $rst = DB::$connection['con2']->table('ad_promote_collect')
         // ->withDebug()
