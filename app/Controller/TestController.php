@@ -5,6 +5,8 @@ use Framework\Http\Controller;
 use Framework\Http\Requests;
 use Framework\DB\DB;
 use App\Models\Test;
+use Framework\DB\Redis;
+
 
 class TestController extends Controller
 {
@@ -21,9 +23,20 @@ class TestController extends Controller
         // $rst = DB::connection('con1')->table('ad_promote_info')
         //      ->where('id', '<', 10)
         //      ->get();
-       $rst = $model
-              ->where('id', '<', 10)
-              ->get();
+
+        $value = Redis::$client->get('rst');
+        if( ! $value) {
+             $rst = $model
+                    ->where('id', '<', 10)
+                    ->get();
+
+             Redis::$client->set('rst', json_encode($rst));
+        } else {
+            $rst = json_decode($value);
+        }
+
+        
+
         // $rst = DB::connection('con2')->table('ad_promote_collect')
         //      ->where([
         //        'adId' => '001-001',
