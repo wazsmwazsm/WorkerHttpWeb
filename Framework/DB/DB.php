@@ -1,6 +1,7 @@
 <?php
 namespace Framework\DB;
 use Framework\Config;
+use Framework\Error;
 use Framework\DB\Drivers\Mysql;
 /**
  * DB.
@@ -39,7 +40,8 @@ class DB
                         break;
                 }
             } catch (\Exception $e) {
-                echo "Database connect fail, check your database config for connection '$con_name' \n".$e->getMessage()."\n";
+                $msg = "Database connect fail, check your database config for connection '$con_name' \n".$e->getMessage();
+                Error::printError($msg);
             }
         }
     }
