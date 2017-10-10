@@ -6,6 +6,8 @@ use Framework\Http\Response;
 use Framework\Http\Route;
 use Framework\Error;
 use Framework\DB\DB;
+use Framework\DB\Redis;
+
 /**
  * App.
  *
@@ -50,14 +52,16 @@ class App
     }
 
     /**
-     * init db connections.
+     * Initialize some devices like redis \ database ...
      *
      * @return void
      */
-    public static function dbInit()
+    public static function init()
     {
         // init database
         DB::init();
+        // init redis
+        Redis::init();
     }
 
 }

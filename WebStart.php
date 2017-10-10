@@ -3,8 +3,6 @@
 require_once __DIR__ . '/bootstrap/boot.php';
 use Workerman\Worker;
 use Framework\App;
-use Framework\DB\Redis;
-use Predis\Client;
 
 // echo error message on daemon mode
 Worker::$stdoutFile = './tmp/log/error.log';
@@ -15,10 +13,8 @@ $http_worker->count = 4;
 $http_worker->user = 'www-data';
 
 $http_worker->onWorkerStart = function($http_worker) {
-    // init db connection
-    App::dbInit();
-
-    Redis::$client = new Client();
+    // init app
+    App::init();
 };
 
 $http_worker->onMessage = function($con, $data) {

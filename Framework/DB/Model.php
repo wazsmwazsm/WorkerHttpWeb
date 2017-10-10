@@ -50,7 +50,7 @@ class Model
         $instance = new static;
         // get db connection
         $db = DB::connection($instance->connection)->table($instance->table);
-        
+
         return call_user_func_array([$db, $method], $params);
     }
 }
