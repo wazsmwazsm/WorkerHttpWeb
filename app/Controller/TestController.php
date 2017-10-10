@@ -24,18 +24,20 @@ class TestController extends Controller
         //      ->where('id', '<', 10)
         //      ->get();
 
-        $value = Redis::$client->get('rst');
-        if( ! $value) {
-             $rst = $model
-                    ->where('id', '<', 10)
-                    ->get();
+        // $value = Redis::$client->get('rst');
+        // if( ! $value) {
+        //      $rst = $model
+        //             ->where('id', '<', 10)
+        //             ->get();
+        //
+        //      Redis::$client->set('rst', json_encode($rst));
+        // } else {
+        //     $rst = json_decode($value);
+        // }
+        $rst = $model
+               ->where('id', '<', 10)
+               ->get();
 
-             Redis::$client->set('rst', json_encode($rst));
-        } else {
-            $rst = json_decode($value);
-        }
-
-        
 
         // $rst = DB::connection('con2')->table('ad_promote_collect')
         //      ->where([
