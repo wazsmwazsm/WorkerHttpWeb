@@ -4,6 +4,7 @@ namespace Framework\DB;
 use Framework\Config;
 use Framework\Error;
 use Predis\Client;
+use Closure;
 /**
  * Redis.
  *
@@ -46,6 +47,29 @@ class Redis
     }
 
     /**
+     * Get a specific Redis connection instance.
+     *
+     * @param  string  $con
+     * @return \Predis\ClientInterface|null
+     */
+    public static function connection($con)
+    {
+        return self::$_clients[$con];
+    }
+
+    /**
+     * Run a command against the Redis database.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public static function cmd($method, array $parameters = [])
+    {
+        return call_user_func_array([self::$_clients['default'], $method], $parameters);
+    }
+
+    /**
      * Create a new aggregate client supporting sharding.
      *
      * @param  array  $servers
@@ -73,6 +97,45 @@ class Redis
         }
 
         return $clients;
+    }
+
+    /**
+     * Subscribe to a set of given channels for messages.
+     * 'read_write_timeout' => 0 to solve the timeout problem
+     *
+     * @param  array|string  $channels
+     * @param  \Closure  $callback
+     * @param  string  $connection
+     * @param  string  $method
+     * @return void
+     */
+    public static function subscribe($channels, Closure $callback, $connection = 'default', $method = 'subscribe')
+    {
+        $loop = self::$_clients[$connection]->pubSubLoop();
+
+        call_user_func_array([$loop, $method], (array) $channels);
+        // get publish message
+        foreach ($loop as $message) {
+            if ($message->kind === 'message' || $message->kind === 'pmessage') {
+
+                call_user_func($callback, $message->payload, $message->channel);
+            }
+        }
+
+        unset($loop);
+    }
+
+    /**
+     * Subscribe to a set of given channels with wildcards.
+     *
+     * @param  array|string  $channels
+     * @param  \Closure  $callback
+     * @param  string  $connection
+     * @return void
+     */
+    public static function psubscribe($channels, Closure $callback, $connection = 'default')
+    {
+        return self::subscribe($channels, $callback, $connection, 'psubscribe');
     }
 
     /**
