@@ -1,9 +1,11 @@
 <?php
-
 namespace Framework\DB\Drivers;
-
 use Closure;
-
+/**
+ * DB Driver interface
+ *
+ * @author MirQin https://github.com/wazsmwazsm
+ */
 interface ConnectorInterface
 {
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace Framework\DB;
 use Framework\Config;
 use Framework\Error;
