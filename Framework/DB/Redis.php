@@ -38,9 +38,9 @@ class Redis
         // check redis connect
         foreach (self::$_clients as $con_name => $client) {
             try {
-                $client->ping();
+                $client->connect();
             } catch (\Exception $e) {
-                $msg = "Redis connect fail, check your redis config for connection '$con_name' . \n".$e->getMessage();
+                $msg = "Redis connect fail, check your redis config for connection '$con_name'. \n".$e->getMessage();
                 Error::printError($msg);
             }
         }
@@ -114,14 +114,15 @@ class Redis
         $loop = self::$_clients[$connection]->pubSubLoop();
 
         call_user_func_array([$loop, $method], (array) $channels);
-        // get publish message
+
+        // loop blocking, start listen redis publish messages
         foreach ($loop as $message) {
             if ($message->kind === 'message' || $message->kind === 'pmessage') {
-
+                // get publish message
                 call_user_func($callback, $message->payload, $message->channel);
             }
         }
-
+        // unset Predis\PubSub\Consumer iterator
         unset($loop);
     }
 
