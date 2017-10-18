@@ -1,6 +1,10 @@
 <?php
 namespace Framework\Tool;
-
+/**
+ * DotArr  a.b.c.d  to  $test[a][b][c][d].
+ *
+ * @author MirQin https://github.com/wazsmwazsm
+ */
 class DotArr
 {
     /**
