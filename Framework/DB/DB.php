@@ -3,6 +3,7 @@ namespace Framework\DB;
 use Framework\Config;
 use Framework\Error;
 use Framework\DB\Drivers\Mysql;
+use Framework\DB\Drivers\Pgsql;
 /**
  * DB.
  *
@@ -32,6 +33,12 @@ class DB
                 switch (strtolower($db_conf['driver'])) {
                     case 'mysql':
                         self::$_connections[$con_name] = new Mysql
+                        (
+                            $db_conf['host'], $db_conf['port'], $db_conf['user'], $db_conf['password'], $db_conf['dbname'], $db_conf['charset']
+                        );
+                        break;
+                    case 'pgsql':
+                        self::$_connections[$con_name] = new Pgsql
                         (
                             $db_conf['host'], $db_conf['port'], $db_conf['user'], $db_conf['password'], $db_conf['dbname'], $db_conf['charset']
                         );

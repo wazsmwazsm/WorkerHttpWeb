@@ -20,6 +20,15 @@ return [
           'dbname'   => 'ad_show_control_db',
           'charset'  => 'utf8',
         ],
+        'con3' => [
+          'driver'   => 'pgsql',
+          'host'     => 'localhost',
+          'port'     => '5432',
+          'user'     => 'homestead',
+          'password' => 'secret',
+          'dbname'   => 'homestead',
+          'charset'  => 'utf8',
+        ],
     ],
 
     'redis' => [

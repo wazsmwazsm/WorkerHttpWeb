@@ -9,7 +9,7 @@ use Framework\DB\Drivers\PDODriver;
  *
  * @author MirQin https://github.com/wazsmwazsm
  */
-class Mysql extends PDODriver implements ConnectorInterface
+class Pgsql extends PDODriver implements ConnectorInterface
 {
 
     /**
@@ -20,7 +20,7 @@ class Mysql extends PDODriver implements ConnectorInterface
      */
     protected function _connect()
     {
-        $dsn = 'mysql:dbname='.$this->_config['dbname'].
+        $dsn = 'pgsql:dbname='.$this->_config['dbname'].
                ';host='.$this->_config['host'].
                ';port='.$this->_config['port'];
 
@@ -28,8 +28,7 @@ class Mysql extends PDODriver implements ConnectorInterface
             $this->_pdo = new PDO(
                 $dsn,
                 $this->_config['user'],
-                $this->_config['password'],
-                [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset']]
+                $this->_config['password']
             );
             // set error mode
             $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
