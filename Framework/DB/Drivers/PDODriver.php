@@ -373,7 +373,7 @@ class PDODriver implements ConnectorInterface
      */
     protected static function _escape($word)
     {
-        return self::$_escape_symbol.$word.self::$_escape_symbol;
+        return static::$_escape_symbol.$word.static::$_escape_symbol;
     }
 
     /**

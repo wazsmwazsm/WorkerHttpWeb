@@ -13,6 +13,13 @@ class Pgsql extends PDODriver implements ConnectorInterface
 {
 
     /**
+     * escape symbol
+     *
+     * @var array
+     */
+    protected static $_escape_symbol = '"';
+
+    /**
      * create a PDO instance
      *
      * @return  void
