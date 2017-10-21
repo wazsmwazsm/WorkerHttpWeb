@@ -141,6 +141,13 @@ class PDODriver implements ConnectorInterface
     protected $_bind_params = [];
 
     /**
+     * escape symbol
+     *
+     * @var array
+     */
+    protected static $_escape_symbol = '`';
+
+    /**
      * construct , create a db connection
      *
      * @param string $host
@@ -359,6 +366,17 @@ class PDODriver implements ConnectorInterface
     }
 
     /**
+     * escape a reserved word
+     *
+     * @param   string  $word
+     * @return  string
+     */
+    protected static function _escape($word)
+    {
+        return self::$_escape_symbol.$word.self::$_escape_symbol;
+    }
+
+    /**
      * add backquote sto field, support alias mode, prefix mode, func mode
      *
      * @param  string $str
@@ -368,16 +386,16 @@ class PDODriver implements ConnectorInterface
     {
         // match pattern
         $alias_pattern = '/([a-zA-Z0-9_\.]+)\s+(AS|as|As)\s+([a-zA-Z0-9_]+)/';
-        $alias_replace = '`$1` $2 `$3`';
+        $alias_replace = self::_escape('$1').' $2 '.self::_escape('$3');
         $prefix_pattern = '/([a-zA-Z0-9_]+\s*)(\.)(\s*[a-zA-Z0-9_]+)/';
-        $prefix_replace = '`$1`$2`$3`';
+        $prefix_replace = self::_escape('$1').'$2'.self::_escape('$3');
         $func_pattern = '/[a-zA-Z0-9_]+\([a-zA-Z0-9_\,\s\`\'\"\*]*\)/';
         // alias mode
         if(preg_match($alias_pattern, $str, $alias_match)) {
             // if field is aa.bb as cc mode
             if(preg_match($prefix_pattern, $alias_match[1])) {
                 $pre_rst = preg_replace($prefix_pattern, $prefix_replace, $alias_match[1]);
-                $alias_replace = $pre_rst.' $2 `$3`';
+                $alias_replace = $pre_rst.' $2 '.self::_escape('$3');
             }
             return preg_replace($alias_pattern, $alias_replace, $str);
         }
@@ -390,7 +408,7 @@ class PDODriver implements ConnectorInterface
             return $str;
         }
         // field mode
-        return '`'.$str.'`';
+        return self::_escape($str);
     }
 
     /**
@@ -1184,7 +1202,7 @@ class PDODriver implements ConnectorInterface
      */
     public function list($field)
     {
-        $this->_cols_str = ' `'.$field.'` ';
+        $this->_cols_str = ' '.self::_escape($field).' ';
         $this->_buildQuery();
         $this->_execute();
 
@@ -1201,7 +1219,7 @@ class PDODriver implements ConnectorInterface
     public function count($field = '*')
     {
         if(trim($field) != '*') {
-            $field = '`'.$field.'`';
+            $field = self::_escape($field);
         }
         $this->_cols_str = ' COUNT('.$field.') AS count_num ';
 
@@ -1217,7 +1235,7 @@ class PDODriver implements ConnectorInterface
      */
     public function sum($field)
     {
-        $this->_cols_str = ' SUM(`'.$field.'`) AS sum_num ';
+        $this->_cols_str = ' SUM('.self::_escape($field).') AS sum_num ';
 
         return $this->row()['sum_num'];
     }
@@ -1231,7 +1249,7 @@ class PDODriver implements ConnectorInterface
      */
     public function max($field)
     {
-        $this->_cols_str = ' MAX(`'.$field.'`) AS max_num ';
+        $this->_cols_str = ' MAX('.self::_escape($field).') AS max_num ';
 
         return $this->row()['max_num'];
     }
@@ -1245,7 +1263,7 @@ class PDODriver implements ConnectorInterface
      */
     public function min($field)
     {
-        $this->_cols_str = ' MIN(`'.$field.'`) AS min_num ';
+        $this->_cols_str = ' MIN('.self::_escape($field).') AS min_num ';
 
         return $this->row()['min_num'];
     }
@@ -1259,7 +1277,7 @@ class PDODriver implements ConnectorInterface
      */
     public function avg($field)
     {
-        $this->_cols_str = ' AVG(`'.$field.'`) AS avg_num ';
+        $this->_cols_str = ' AVG('.self::_escape($field).') AS avg_num ';
 
         return $this->row()['avg_num'];
     }
