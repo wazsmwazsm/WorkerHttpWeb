@@ -8,5 +8,5 @@ class Test extends Model
 {
     protected $connection = 'con3';
 
-    protected $table = 'users';
+    protected $table = 'permissions';
 }

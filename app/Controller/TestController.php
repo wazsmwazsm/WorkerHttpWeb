@@ -15,16 +15,16 @@ class TestController extends Controller
         // $rst = DB::connection('con1')->query('select * from ad_promote_info limit 0, 30');
 
 
-        // $rst = DB::connection('con2')->table('ad_promote_collect')
-        //      ->leftJoin('ad_promote_oss', 'ad_promote_oss.adId', 'ad_promote_collect.adId')
-        //      ->select('ad_promote_oss.adId')
+        // $rst = DB::connection('con3')->table('ad_promote_collect')
+        //      ->leftJoin('ad_promote_info', 'ad_promote_info.adId', 'ad_promote_collect.adId')
+        //      ->select('ad_promote_info.adId')
         //      ->where('ad_promote_collect.date', 1500912000)
         //      ->get();
         // $rst = DB::connection('con1')->table('ad_promote_info')
         //      ->where('id', '<', 10)
         //      ->get();
-        $rst = $model
-               ->get();
+        // $rst = $model->where('id', '<', 10)
+        //        ->get();
         // $value = Redis::get('rst');
         // if( ! $value) {
         //      $rst = $model
@@ -48,14 +48,15 @@ class TestController extends Controller
         //        'adStyle' => 'big_ad',
         //      ])
         //      ->get();
-        // $rst = DB::connection('con2')->table('ad_promote_collect')
-        //      ->where('id', '<', 10)
-        //      ->orWhereBrackets(function($query) {
-        //         $query->where('adId', '001-001')
-        //               ->orWhere('adId', '001-003');
-        //      })
-        //      ->orderBy('id', 'DESC')
-        //      ->get();
+        $rst = DB::connection('con3')->table('ad_promote_collect')
+             ->where('id', '<', 10)
+             ->orWhereBrackets(function($query) {
+                $query->where('adId', '001-001')
+                      ->orWhere('adId', '001-003');
+             })
+             ->orderBy('id', 'DESC')
+             ->limit(1, 2)
+             ->get();
 
 
         // $rst = Test::where([
