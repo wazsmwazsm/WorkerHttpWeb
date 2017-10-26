@@ -1125,7 +1125,7 @@ class PDODriver implements ConnectorInterface
      */
     public function limit($offset, $step)
     {
-        $this->_limit_str = ' LIMIT '.$offset.' , '.$step.' ';
+        $this->_limit_str = ' LIMIT '.$step.' OFFSET '.$offset.' ';
 
         return $this;
     }

@@ -48,14 +48,14 @@ class TestController extends Controller
         //        'adStyle' => 'big_ad',
         //      ])
         //      ->get();
-        $rst = DB::connection('con3')->table('ad_promote_collect')
+        $rst = DB::connection('con1')->table('ad_promote_collect')
              ->where('id', '<', 10)
              ->orWhereBrackets(function($query) {
                 $query->where('adId', '001-001')
-                      ->orWhere('adId', '001-003');
+                      ->orWhere(['adId' => '001-001', 'id' => '1']);
              })
              ->orderBy('id', 'DESC')
-             ->limit(1, 2)
+             ->limit(1, 2)->withDebug()
              ->get();
 
 
