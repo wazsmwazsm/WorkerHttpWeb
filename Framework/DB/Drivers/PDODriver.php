@@ -416,12 +416,11 @@ class PDODriver implements ConnectorInterface
      *
      * @param  int $args_num
      * @param  array $params
-     * @param  string $operator
      * @param  string &$construct_str
      * @return  void
      * @throws  \InvalidArgumentException
      */
-    protected function _condition_constructor($args_num, $params, $operator, &$construct_str)
+    protected function _condition_constructor($args_num, $params, &$construct_str)
     {
         // params dose not conform to specification
         if( ! $args_num || $args_num > 3) {
@@ -434,13 +433,15 @@ class PDODriver implements ConnectorInterface
               if( ! is_array($params[0])) {
                   throw new \InvalidArgumentException($params[0].' should be Array');
               }
+              $construct_str .= '(';
               foreach ($params[0] as $field => $value) {
                   $plh = self::_getPlh();
-                  $construct_str .= ' '.self::_backquote($field).' = '.$plh.' '.$operator;
+                  $construct_str .= ' '.self::_backquote($field).' = '.$plh.' AND';
                   $this->_bind_params[$plh] = $value;
               }
               // remove last operator
-              $construct_str = substr($construct_str, 0, strrpos($construct_str, $operator));
+              $construct_str = substr($construct_str, 0, strrpos($construct_str, 'AND'));
+              $construct_str .= ')';
               break;
           // ('a', 10) : a = 10 mode
           case 2:
@@ -597,7 +598,7 @@ class PDODriver implements ConnectorInterface
             $this->_where_str .= ' '.$operator.' ';
         }
         // build attribute, bind params
-        $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_where_str);
+        $this->_condition_constructor(func_num_args(), func_get_args(), $this->_where_str);
 
         return $this;
     }
@@ -617,7 +618,7 @@ class PDODriver implements ConnectorInterface
             $this->_where_str .= ' '.$operator.' ';
         }
         // build attribute, bind params
-        $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_where_str);
+        $this->_condition_constructor(func_num_args(), func_get_args(), $this->_where_str);
 
         return $this;
     }
@@ -1002,7 +1003,7 @@ class PDODriver implements ConnectorInterface
             $this->_having_str .= ' '.$operator.' ';
         }
         // build attribute, bind params
-        $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_having_str);
+        $this->_condition_constructor(func_num_args(), func_get_args(), $this->_having_str);
 
         return $this;
     }
@@ -1023,7 +1024,7 @@ class PDODriver implements ConnectorInterface
             $this->_having_str .= ' '.$operator.' ';
         }
         // build attribute, bind params
-        $this->_condition_constructor(func_num_args(), func_get_args(), $operator, $this->_having_str);
+        $this->_condition_constructor(func_num_args(), func_get_args(), $this->_having_str);
 
         return $this;
     }
