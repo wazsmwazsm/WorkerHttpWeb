@@ -58,7 +58,6 @@ class TestController extends Controller
              ->limit(1, 2)->withDebug()
              ->get();
 
-
         // $rst = Test::where([
         //       'adId' => '001-001',
         //       'adStyle' => 'big_ad',

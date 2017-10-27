@@ -560,6 +560,16 @@ class PDODriver implements ConnectorInterface
     }
 
     /**
+     * get table
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->_table;
+    }
+
+    /**
      * set select cols
      *
      * @return  self

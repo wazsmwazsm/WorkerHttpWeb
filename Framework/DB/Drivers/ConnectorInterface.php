@@ -32,6 +32,13 @@ interface ConnectorInterface
     public function table($table);
 
     /**
+     * get table
+     *
+     * @return string
+     */
+    public function getTable();
+
+    /**
      * set select cols
      *
      * @return  self
