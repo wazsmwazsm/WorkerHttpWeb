@@ -48,14 +48,29 @@ class TestController extends Controller
         //        'adStyle' => 'big_ad',
         //      ])
         //      ->get();
-        $rst = DB::connection('con1')->table('ad_promote_collect')
-             ->where('id', '<', 10)
-             ->orWhereBrackets(function($query) {
-                $query->where('adId', '001-001')
-                      ->orWhere(['adId' => '001-001', 'id' => '1']);
+        // $rst = DB::connection('con1')->table('ad_promote_collect')
+        //      ->where('id', '<', 10)
+        //      ->orWhereBrackets(function($query) {
+        //         $query->where('adId', '001-001')
+        //               ->orWhere(['adId' => '001-001', 'id' => '1']);
+        //      })
+        //      ->orderBy('id', 'DESC')
+        //      ->limit(1, 2)->withDebug()
+        //      ->get();
+        //  $rst = DB::connection('con3')->table('ad_promote_collect')
+        //       ->whereNotExists(function($query) {
+        //           $query->table('ad_promote_collect')->where('adId', '001-005');
+        //       })
+        //       ->orderBy('id', 'DESC')
+        //       ->limit(1, 10)->withDebug()
+        //       ->get();
+
+        $rst = $model
+             ->whereNotExists(function($query) use($model) {
+                 $query->table($model->getTable())->where('adId', '001-005');
              })
              ->orderBy('id', 'DESC')
-             ->limit(1, 2)->withDebug()
+             ->limit(1, 10)->withDebug()
              ->get();
 
         // $rst = Test::where([
@@ -73,11 +88,11 @@ class TestController extends Controller
         //       ->list('id');
         // $rst = (string) $rst;
 
-        // $rst = DB::connection('con2')->table('ad_promote_collect')
+        // $rst = DB::connection('con1')->table('ad_promote_collect')
         //      ->whereNull('adStyle')
         //      ->whereNotNull('package_name')
         //      ->get();
-        // $rst = DB::connection('con2')->table('ad_promote_collect')
+        // $rst = DB::connection('con3')->table('ad_promote_collect')
         //      ->whereInSub('id', function($query) {
         //           $query->table('ad_promote_info')
         //                 ->select('id')->where('id', '<', '10');
@@ -97,7 +112,7 @@ class TestController extends Controller
         // ->orderBy('id', 'ASC')
         // ->paginate(10, $request->page);
 
-        // $rst = DB::connection('con2')->table('ad_promote_collect')
+        // $rst = DB::connection('con3')->table('ad_promote_collect')
         // ->withDebug()
         // ->insert([
         //   'package_name' => 'aa',
@@ -109,15 +124,21 @@ class TestController extends Controller
         //   'date' => time(),
         // ]);
 
-
+        // $rst = DB::connection('con3')->table('ad_promote_collect')
+        // ->withDebug()
+        // ->where(['package_name' => 'com.baiwang.styleinstaboxsnap',
+        // 'adStyle' => 'banner_ad',])
+        // ->update([
+        //     'request' => '3',
+        // ]);
         // $rst = DB::connection('con2')->table('ad_promote_collect')
         // ->where('package_name', 'aa')->withDebug()
         // ->update([
         //   'impression' => 20,
         //   'click' => 10,
         // ]);
-        // $rst = DB::connection('con2')->table('ad_promote_collect')
-        // ->where('package_name', 'aa')
+        // $rst = DB::connection('con3')->table('ad_promote_collect')
+        // ->where('date', '0')
         // ->delete();
 
         // $rst = (string) $rst;
