@@ -57,6 +57,7 @@ class Route {
      */
     public static function group(array $filter, Closure $routes)
     {
+        // save sttribute
         $tmp_prefix    = self::$_filter['prefix'];
         $tmp_namespace = self::$_filter['namespace'];
 
@@ -70,7 +71,7 @@ class Route {
         }
         // call route setting
         call_user_func($routes);
-        // out the scope of the group method, empty filter
+        // recover sttribute
         self::$_filter['prefix'] = $tmp_prefix;
         self::$_filter['namespace'] = $tmp_namespace;
     }
