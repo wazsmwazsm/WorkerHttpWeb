@@ -72,7 +72,7 @@ class Route {
         // call route setting
         call_user_func($routes);
         // recover sttribute
-        self::$_filter['prefix'] = $tmp_prefix;
+        self::$_filter['prefix']    = $tmp_prefix;
         self::$_filter['namespace'] = $tmp_namespace;
     }
 
