@@ -3,7 +3,9 @@
         "workerman/workerman": "^3.4",
         "predis/predis": "^v1.1.1",
         "ext-pdo": "*",
-        "ext-pdo_mysql": "*"
+        "ext-pdo_mysql": "*",
+        "phpunit/phpunit": "6.3",
+        "phpunit/dbunit": "3.0.*"
     },
     "autoload": {
         "psr-4": {
