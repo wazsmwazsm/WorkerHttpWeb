@@ -71,7 +71,7 @@ class MysqlTest extends TestCase
         $this->assertEquals($expect, self::$db->table($table)->list($field));
 
         // count
-        $pre = self::$pdo->prepare('select COUNT(`'.$field.'`) as count_num from '.$table);
+        $pre = self::$pdo->prepare('select COUNT('.$field.') as count_num from '.$table);
         $pre->execute();
         $expect = $pre->fetch(PDO::FETCH_ASSOC)['count_num'];
 
