@@ -142,7 +142,14 @@ class TestController extends Controller
         // ->delete();
 
         // $rst = (string) $rst;
-
+        // $rst = DB::connection('con3')->table('users')->get();
+        // $xml = '';
+        // $i = 0;
+        // foreach ($rst as $key => $value) {
+        //     $xml .= "<row>\n\t<value>".$i++."</value>\n\t<value>1</value>\n\t<value>".$value['name']."</value>\n\t<value>".$value['email']."</value>\n\t<value>50</value>\n\t<value>".$value['activated']."</value>\n\t<value>".time()."</value>\n</row>\n";
+        // }
+        // $myfile = fopen("xml.txt", "w");
+        // fwrite($myfile, $xml);
         return $rst;
     }
 }

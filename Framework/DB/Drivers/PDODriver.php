@@ -566,7 +566,7 @@ class PDODriver implements ConnectorInterface
      */
     public function getTable()
     {
-        return trim($this->_table, '"');
+        return trim($this->_table, '"`');
     }
 
     /**
