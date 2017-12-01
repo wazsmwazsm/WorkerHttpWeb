@@ -177,7 +177,7 @@ class PDODQLTest extends TestCase
 
         $this->assertEquals($expect, $testResult);
 
-        // and where 
+        // and where
         $expect = self::$pdo->query('SELECT * FROM user WHERE (sort_num = 20 AND activated = 0 AND id = 24)')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->table('user')
@@ -339,9 +339,210 @@ class PDODQLTest extends TestCase
             ->get();
 
         $this->assertEquals($expect, $testResult);
+
+        // Where Brackets sub
+        $expect = self::$pdo->query('SELECT * FROM user WHERE (id < 50 AND (sort_num = 20 OR activated != 1)) AND id != 20')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->whereBrackets(function($query) {
+                $query->where('id', '<', 50)
+                      ->whereBrackets(function($query) {
+                          $query->where('sort_num', 20)
+                                ->orWhere('activated', '!=', 1);
+                      });
+            })
+            ->where('id', '!=', 20)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+    }
+
+    public function testWhereExists()
+    {
+        // where Exist
+        $expect = self::$pdo->query('SELECT * FROM user WHERE EXISTS ( SELECT * FROM user_group WHERE ID = 3 ) AND g_id = 3')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->whereExists(function($query) {
+                $query->table('user_group')->where('id', 3);
+            })
+            ->where('g_id', 3)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // where Not Exist
+        $expect = self::$pdo->query('SELECT * FROM user WHERE NOT EXISTS ( SELECT * FROM user_group WHERE ID = 3 ) AND g_id = 3')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->whereNotExists(function($query) {
+                $query->table('user_group')->where('id', 3);
+            })
+            ->where('g_id', 3)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // or where Exist
+        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id = 3 OR EXISTS ( SELECT * FROM user_group WHERE ID = 3 )')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->where('g_id', 3)
+            ->orWhereExists(function($query) {
+                $query->table('user_group')->where('id', 3);
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // or where Not Exist
+        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id = 3 OR NOT EXISTS ( SELECT * FROM user_group WHERE ID = 3 )')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->where('g_id', 3)
+            ->orWhereNotExists(function($query) {
+                $query->table('user_group')->where('id', 3);
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // more complex
+        $expect = self::$pdo->query('SELECT * FROM user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM user WHERE username = \'Jackie aa\' ) AND username = \'Jackie Conroy\' )')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->where('username', 'Jackie aa')
+            ->orWhereBrackets(function($query) {
+                $query->whereNotExists(function($query) {
+                    $query->table('user')->where('username', 'Jackie aa');
+                })->where('username', 'Jackie Conroy');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+    }
+
+    public function testWhereInSub()
+    {
+        // where in sub
+        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id IN ( SELECT id FROM user_group) ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->whereInSub('g_id', function($query) {
+                $query->table('user_group')->select('id');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // where not in sub
+        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id NOT IN ( SELECT id FROM user_group) ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->whereNotInSub('g_id', function($query) {
+                $query->table('user_group')->select('id');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // or where in sub
+        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id != 1 OR g_id IN ( SELECT id FROM user_group) ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->where('g_id', '!=', 1)
+            ->orWhereInSub('g_id', function($query) {
+                $query->table('user_group')->select('id');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // or where not in sub
+        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id != 1 OR g_id NOT IN ( SELECT id FROM user_group) ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->where('g_id', '!=', 1)
+            ->orWhereNotInSub('g_id', function($query) {
+                $query->table('user_group')->select('id');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
     }
 
 
+    public function testFromSub()
+    {
+        // fromSub
+        $expect = self::$pdo->query('SELECT id, username, email FROM ( SELECT * FROM user WHERE id < 20 ) AS tb_1 ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->select('id', 'username', 'email')
+            ->fromSub(function($query) {
+                $query->table('user')->where('id', '<', '20');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+    }
+
+
+    public function testGroupBy()
+    {
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM user GROUP BY sort_num')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'COUNT(sort_num)')
+            ->groupBy('sort_num')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+    }
+
+    public function testHaving()
+    {
+        // having 3 param
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM user GROUP BY sort_num HAVING COUNT(sort_num) < 20')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'COUNT(sort_num)')
+            ->groupBy('sort_num')
+            ->having('COUNT(sort_num)', '<', 20)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // having 2 param
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM user GROUP BY sort_num HAVING COUNT(sort_num) = 3')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'COUNT(sort_num)')
+            ->groupBy('sort_num')
+            ->having('COUNT(sort_num)', 3)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // having array param
+        $expect = self::$pdo->query('SELECT sort_num, activated FROM user GROUP BY sort_num, activated HAVING sort_num = 20 AND activated = 0')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'activated')
+            ->groupBy('sort_num')
+            ->groupBy('activated')
+            ->having(['sort_num' => 20, 'activated' => 0])
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+    }
 
 
 }
