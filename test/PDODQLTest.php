@@ -616,4 +616,60 @@ class PDODQLTest extends TestCase
 
         $this->assertEquals($expect, $testResult);
     }
+
+    public function testJoin()
+    {
+        // inner join
+        $expect = self::$pdo->query('SELECT * FROM user INNER JOIN user_group ON user.g_id = user_group.id')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->join('user_group', 'user.g_id', 'user_group.id')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // left join
+        $expect = self::$pdo->query('SELECT user.username, user_group.groupname FROM user LEFT JOIN user_group ON user.g_id = user_group.id')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->select('user.username', 'user_group.groupname')
+            ->leftJoin('user_group', 'user.g_id', 'user_group.id')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // right join
+        $expect = self::$pdo->query('SELECT user.username, user_group.groupname FROM user RIGHT JOIN user_group ON user.g_id = user_group.id')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->select('user.username', 'user_group.groupname')
+            ->rightJoin('user_group', 'user.g_id', 'user_group.id')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+    }
+
+    public function testComplex()
+    {
+        // sub query with join
+        $expect = self::$pdo->query('SELECT user.username, user_group.groupname FROM user LEFT JOIN user_group ON user.g_id = user_group.id WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM user WHERE username = \'Jackie aa\' ) AND username = \'Jackie Conroy\' )')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->select('user.username', 'user_group.groupname')
+            ->leftJoin('user_group', 'user.g_id', 'user_group.id')
+            ->where('user.username', 'Jackie aa')
+            ->orWhereBrackets(function($query) {
+                $query->whereNotExists(function($query) {
+                    $query->table('user')->where('username', 'Jackie aa');
+                })->where('user.username', 'Jackie Conroy');
+            })
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // group by with join
+        
+    }
+
 }
