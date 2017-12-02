@@ -544,5 +544,45 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
     }
 
+    public function testOrderBy()
+    {
+        // order by
+        $expect = self::$pdo->query('SELECT * FROM user ORDER BY id')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->orderBy('id')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // desc
+        $expect = self::$pdo->query('SELECT * FROM user ORDER BY id DESC')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // asc
+        $expect = self::$pdo->query('SELECT * FROM user ORDER BY id ASC')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // order by more field
+        $expect = self::$pdo->query('SELECT * FROM user ORDER BY sort_num DESC, id ASC')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->orderBy('sort_num', 'DESC')
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+    }
 
 }
