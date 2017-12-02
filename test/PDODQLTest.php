@@ -585,4 +585,35 @@ class PDODQLTest extends TestCase
 
     }
 
+    public function testLimit()
+    {
+        $expect = self::$pdo->query('SELECT * FROM user LIMIT 10 OFFSET 3')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->limit(3, 10)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+    }
+
+    public function testPaginate()
+    {
+        $expect = [];
+        $expect['total']        = self::$pdo->query('SELECT COUNT(*) as count_num FROM user')
+                ->fetch(PDO::FETCH_ASSOC)['count_num'];
+        $expect['per_page']     = 10;
+        $expect['current_page'] = 2;
+        $expect['next_page']    = 3;
+        $expect['prev_page']    = 1;
+        $expect['first_page']   = 1;
+        $expect['last_page']    = $expect['total'] / 10;
+        $expect['data']         = self::$pdo->query('SELECT * FROM user LIMIT 10 OFFSET 10')
+                ->fetchAll(PDO::FETCH_ASSOC);
+
+        $testResult = self::$db->table('user')
+            ->paginate(10, 2);
+
+        $this->assertEquals($expect, $testResult);
+    }
 }
