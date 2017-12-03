@@ -1,5 +1,5 @@
 
-
+-- mysql
 CREATE TABLE `user` (
     `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '自增 ID',
     `g_id` int unsigned NOT NULL COMMENT '用户组 ID',
@@ -19,3 +19,24 @@ CREATE TABLE `user_group` (
     `created` int unsigned NOT NULL COMMENT '时间',
     PRIMARY KEY (`id`)
 )ENGINE=InnoDB CHARSET=utf8;
+
+-- postgresql
+
+CREATE TABLE "user" (
+   id int NOT NULL,
+   g_id int NOT NULL,
+   username varchar(40) NOT NULL,
+   email varchar(150) NOT NULL,
+   sort_num int NOT NULL,
+   activated smallint NOT NULL,
+   created int NOT NULL,
+   PRIMARY KEY (id)
+);
+
+CREATE TABLE "user_group" (
+   id int NOT NULL,
+   groupname varchar(40) NOT NULL,
+   sort_num int NOT NULL,
+   created int NOT NULL,
+   PRIMARY KEY (id)
+);
