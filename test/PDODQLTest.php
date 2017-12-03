@@ -542,6 +542,19 @@ class PDODQLTest extends TestCase
             ->get();
 
         $this->assertEquals($expect, $testResult);
+
+        // or having
+        $expect = self::$pdo->query('SELECT sort_num, activated FROM user GROUP BY sort_num, activated HAVING sort_num = 20 OR sort_num = 50')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'activated')
+            ->groupBy('sort_num')
+            ->groupBy('activated')
+            ->having('sort_num', 20)
+            ->orHaving('sort_num', 50)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
     }
 
     public function testOrderBy()
@@ -669,7 +682,41 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // group by with join
-        
+        $expect = self::$pdo->query('SELECT user.sort_num, COUNT(*) FROM user INNER JOIN user_group ON user.g_id = user_group.id WHERE user.activated <> 0 GROUP BY user.sort_num HAVING user.sort_num = 20 OR user.sort_num = 50 ORDER BY user.sort_num DESC')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->select('user.sort_num', 'COUNT(*)')
+            ->join('user_group', 'user.g_id', 'user_group.id')
+            ->where('user.activated', '<>', 0)
+            ->groupBy('user.sort_num')
+            ->having('user.sort_num', '50')
+            ->orHaving('user.sort_num', '20')
+            ->orderBy('user.sort_num', 'DESC')
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
+        // more complex
+        $expect = self::$pdo->query('SELECT * FROM user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM user WHERE username = \'Jackie aa\' ) AND (username = \'Jackie Conroy\' OR username = \'Jammie Haag\')) AND g_id IN ( SELECT id FROM user_group) ORDER BY id DESC LIMIT 1 OFFSET 0 ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('user')
+            ->where('username', 'Jackie aa')
+            ->orWhereBrackets(function($query) {
+                $query->whereNotExists(function($query) {
+                    $query->table('user')->where('username', 'Jackie aa');
+                })->WhereBrackets(function($query) {
+                    $query->where('username', 'Jackie Conroy')
+                          ->orWhere('username', 'Jammie Haag');
+                });
+            })
+            ->whereInSub('g_id', function($query) {
+                $query->table('user_group')->select('id');
+            })
+            ->orderBy('id', 'DESC')
+            ->limit(0, 1)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
     }
 
 }
