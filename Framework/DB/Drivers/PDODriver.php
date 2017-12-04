@@ -455,14 +455,14 @@ class PDODriver implements ConnectorInterface
               $construct_str .= ')';
               break;
           // ('a', 10) : a = 10 mode or ('a', null) : a is null mode
-          case 2:
-              $plh = self::_getPlh();
-              $operator = ' = ';
+          case 2:              
               if(is_null($params[1])) {
-                  $operator = ' IS ';
+                  $construct_str .= ' '.self::_backquote($params[0]).' IS NULL ';
+              } else {
+                  $plh = self::_getPlh();
+                  $construct_str .= ' '.self::_backquote($params[0]).' = '.$plh.' ';
+                  $this->_bind_params[$plh] = $params[1];
               }
-              $construct_str .= ' '.self::_backquote($params[0]).$operator.$plh.' ';
-              $this->_bind_params[$plh] = $params[1];
               break;
           // ('a', '>', 10) : a > 10 mode \ ('name', 'like', '%adam%') : name like '%adam%' mode
           case 3:

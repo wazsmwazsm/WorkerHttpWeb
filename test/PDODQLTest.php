@@ -170,6 +170,25 @@ class PDODQLTest extends TestCase
 
         $this->assertEquals($expect, $testResult);
 
+        // where like
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE username LIKE \'%a%\' ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('t_user')->where('username', 'like', '%a%')->get();
+
+        $this->assertEquals($expect, $testResult);
+        // where not like
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE username NOT LIKE \'%a%\' ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('t_user')->where('username', 'NOT LIKE', '%a%')->get();
+
+        $this->assertEquals($expect, $testResult);
+        // where is null
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id IS NULL ')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('t_user')->where('id', NULL)->get();
+
+        $this->assertEquals($expect, $testResult);
+
         // where array param
         $expect = self::$pdo->query('SELECT * FROM t_user WHERE sort_num = 20 AND activated = 0')
                 ->fetchAll(PDO::FETCH_ASSOC);
