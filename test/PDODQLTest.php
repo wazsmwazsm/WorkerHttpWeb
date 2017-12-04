@@ -20,77 +20,77 @@ class PDODQLTest extends TestCase
 
     public function testSetGetTable()
     {
-        $this->assertEquals('user', self::$db->table('user')->getTable());
+        $this->assertEquals('t_user', self::$db->table('t_user')->getTable());
     }
 
     public function testGet()
     {
-        $expect = self::$pdo->query('SELECT * FROM user ')
+        $expect = self::$pdo->query('SELECT * FROM t_user ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->get();
+        $testResult = self::$db->table('t_user')->get();
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testRow()
     {
-        $expect = self::$pdo->query('SELECT * FROM user ')
+        $expect = self::$pdo->query('SELECT * FROM t_user ')
                 ->fetch(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->row();
+        $testResult = self::$db->table('t_user')->row();
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testList()
     {
-        $expect = self::$pdo->query('SELECT username FROM user ')
+        $expect = self::$pdo->query('SELECT username FROM t_user ')
                 ->fetchAll(PDO::FETCH_COLUMN, 0);
-        $testResult = self::$db->table('user')->list('username');
+        $testResult = self::$db->table('t_user')->list('username');
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testCount()
     {
-        $expect = self::$pdo->query('SELECT COUNT(*) AS count_num FROM user ')
+        $expect = self::$pdo->query('SELECT COUNT(*) AS count_num FROM t_user ')
                 ->fetch(PDO::FETCH_ASSOC)['count_num'];
-        $testResult = self::$db->table('user')->count('*');
+        $testResult = self::$db->table('t_user')->count('*');
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testSum()
     {
-        $expect = self::$pdo->query('SELECT SUM(id) AS sum_num FROM user ')
+        $expect = self::$pdo->query('SELECT SUM(id) AS sum_num FROM t_user ')
                 ->fetch(PDO::FETCH_ASSOC)['sum_num'];
-        $testResult = self::$db->table('user')->sum('id');
+        $testResult = self::$db->table('t_user')->sum('id');
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testMax()
     {
-        $expect = self::$pdo->query('SELECT MAX(id) AS max_num FROM user ')
+        $expect = self::$pdo->query('SELECT MAX(id) AS max_num FROM t_user ')
                 ->fetch(PDO::FETCH_ASSOC)['max_num'];
-        $testResult = self::$db->table('user')->max('id');
+        $testResult = self::$db->table('t_user')->max('id');
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testMin()
     {
-        $expect = self::$pdo->query('SELECT MIN(id) AS min_num FROM user ')
+        $expect = self::$pdo->query('SELECT MIN(id) AS min_num FROM t_user ')
                 ->fetch(PDO::FETCH_ASSOC)['min_num'];
-        $testResult = self::$db->table('user')->min('id');
+        $testResult = self::$db->table('t_user')->min('id');
 
         $this->assertEquals($expect, $testResult);
     }
 
     public function testAvg()
     {
-        $expect = self::$pdo->query('SELECT AVG(id) AS avg_num FROM user ')
+        $expect = self::$pdo->query('SELECT AVG(id) AS avg_num FROM t_user ')
                 ->fetch(PDO::FETCH_ASSOC)['avg_num'];
-        $testResult = self::$db->table('user')->avg('id');
+        $testResult = self::$db->table('t_user')->avg('id');
 
         $this->assertEquals($expect, $testResult);
     }
@@ -98,15 +98,15 @@ class PDODQLTest extends TestCase
     public function testSelect()
     {
         // field
-        $expect = self::$pdo->query('SELECT username, email FROM user ')
+        $expect = self::$pdo->query('SELECT username, email FROM t_user ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->select('username', 'email')->get();
+        $testResult = self::$db->table('t_user')->select('username', 'email')->get();
 
         $this->assertEquals($expect, $testResult);
         // *
-        $expect = self::$pdo->query('SELECT * FROM user ')
+        $expect = self::$pdo->query('SELECT * FROM t_user ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->select('*')->get();
+        $testResult = self::$db->table('t_user')->select('*')->get();
 
         $this->assertEquals($expect, $testResult);
 
@@ -115,72 +115,72 @@ class PDODQLTest extends TestCase
     public function testWhere()
     {
         // where
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id = 3')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id = 3')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('g_id', 3)->get();
+        $testResult = self::$db->table('t_user')->where('g_id', 3)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where = param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id = 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id = 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '=', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '=', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where > param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id > 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id > 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '>', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '>', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where < param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id < 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id < 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '<', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '<', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where <= param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id <= 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id <= 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '<=', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '<=', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where >= param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id >= 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id >= 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '>=', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '>=', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where !=
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id != 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id != 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '!=', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '!=', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where <>
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id <> 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id <> 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where('id', '<>', 20)->get();
+        $testResult = self::$db->table('t_user')->where('id', '<>', 20)->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where array param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE sort_num = 20 AND activated = 0')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE sort_num = 20 AND activated = 0')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')->where(['sort_num' => 20, 'activated' => 0])->get();
+        $testResult = self::$db->table('t_user')->where(['sort_num' => 20, 'activated' => 0])->get();
 
         $this->assertEquals($expect, $testResult);
 
         // and where
-        $expect = self::$pdo->query('SELECT * FROM user WHERE (sort_num = 20 AND activated = 0 AND id = 24)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE (sort_num = 20 AND activated = 0 AND id = 24)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where(['sort_num' => 20, 'activated' => 0])
             ->where('id', 24)
             ->get();
@@ -188,9 +188,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // or where
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id < 20 OR id >= 100')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id < 20 OR id >= 100')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('id', '<', 20)
             ->orWhere('id', '>=', 100)
             ->get();
@@ -198,9 +198,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // or where array param
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id >= 100 OR (sort_num = 50 AND activated = 1)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id >= 100 OR (sort_num = 50 AND activated = 1)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('id', '>=', 100)
             ->orWhere(['sort_num' => 50, 'activated' => 1])
             ->get();
@@ -212,36 +212,36 @@ class PDODQLTest extends TestCase
     public function testWhereIn()
     {
         // where in
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id IN (1, 2, 20, 30, 21)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id IN (1, 2, 20, 30, 21)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereIn('id', [1, 2, 20, 30, 21])
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where not in
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id NOT IN (1, 2, 20, 30, 21)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id NOT IN (1, 2, 20, 30, 21)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereNotIn('id', [1, 2, 20, 30, 21])
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // or where in
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id = 3 OR id IN (1, 2, 20, 30, 21)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id = 3 OR id IN (1, 2, 20, 30, 21)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->Where('id', '=', 3)
             ->orWhereIn('id', [1, 2, 20, 30, 21])
             ->get();
 
         $this->assertEquals($expect, $testResult);
         // or where not in
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id != 3 OR id NOT IN (1, 2, 20, 30, 21)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id != 3 OR id NOT IN (1, 2, 20, 30, 21)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->Where('id', '!=', 3)
             ->orWhereNotIn('id', [1, 2, 20, 30, 21])
             ->get();
@@ -252,18 +252,18 @@ class PDODQLTest extends TestCase
     public function testWhereBetween()
     {
         // where between
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id BETWEEN 20 and 30')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id BETWEEN 20 and 30')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereBetween('id', 20, 30)
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // or where between
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id = 1 OR id BETWEEN 20 and 30')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id = 1 OR id BETWEEN 20 and 30')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('id', 1)
             ->orWhereBetween('id', 20, 30)
             ->get();
@@ -274,27 +274,27 @@ class PDODQLTest extends TestCase
     public function testWhereNull()
     {
         // where null
-        $expect = self::$pdo->query('SELECT * FROM user WHERE username IS NULL')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE username IS NULL')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereNull('username')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where not null
-        $expect = self::$pdo->query('SELECT * FROM user WHERE username IS NOT NULL')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE username IS NOT NULL')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereNotNull('username')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // or where NULL
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id = 5 OR username IS NULL')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id = 5 OR username IS NULL')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('id', 5)
             ->orWhereNull('username')
             ->get();
@@ -302,9 +302,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // or where not NULL
-        $expect = self::$pdo->query('SELECT * FROM user WHERE id = 5 OR username IS NOT NULL')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE id = 5 OR username IS NOT NULL')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('id', 5)
             ->orWhereNotNull('username')
             ->get();
@@ -315,9 +315,9 @@ class PDODQLTest extends TestCase
     public function testWhereBrackets()
     {
         // Where Brackets
-        $expect = self::$pdo->query('SELECT * FROM user WHERE (id < 50 OR username IS NOT NULL) AND sort_num = 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE (id < 50 OR username IS NOT NULL) AND sort_num = 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereBrackets(function($query) {
                 $query->where('id', '<', 50)
                       ->orWhereNotNull('username');
@@ -328,9 +328,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // or Where Brackets
-        $expect = self::$pdo->query('SELECT * FROM user WHERE sort_num = 20 OR (id < 10 AND id > 5)')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE sort_num = 20 OR (id < 10 AND id > 5)')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('sort_num', 20)
             ->orWhereBrackets(function($query) {
                 $query->where('id', '<', 10)
@@ -341,9 +341,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // Where Brackets sub
-        $expect = self::$pdo->query('SELECT * FROM user WHERE (id < 50 AND (sort_num = 20 OR activated != 1)) AND id != 20')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE (id < 50 AND (sort_num = 20 OR activated != 1)) AND id != 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereBrackets(function($query) {
                 $query->where('id', '<', 50)
                       ->whereBrackets(function($query) {
@@ -360,11 +360,11 @@ class PDODQLTest extends TestCase
     public function testWhereExists()
     {
         // where Exist
-        $expect = self::$pdo->query('SELECT * FROM user WHERE EXISTS ( SELECT * FROM user_group WHERE ID = 3 ) AND g_id = 3')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE EXISTS ( SELECT * FROM t_user_group WHERE ID = 3 ) AND g_id = 3')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereExists(function($query) {
-                $query->table('user_group')->where('id', 3);
+                $query->table('t_user_group')->where('id', 3);
             })
             ->where('g_id', 3)
             ->get();
@@ -372,11 +372,11 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // where Not Exist
-        $expect = self::$pdo->query('SELECT * FROM user WHERE NOT EXISTS ( SELECT * FROM user_group WHERE ID = 3 ) AND g_id = 3')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE NOT EXISTS ( SELECT * FROM t_user_group WHERE ID = 3 ) AND g_id = 3')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereNotExists(function($query) {
-                $query->table('user_group')->where('id', 3);
+                $query->table('t_user_group')->where('id', 3);
             })
             ->where('g_id', 3)
             ->get();
@@ -384,40 +384,40 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // or where Exist
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id = 3 OR EXISTS ( SELECT * FROM user_group WHERE ID = 3 )')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id = 3 OR EXISTS ( SELECT * FROM t_user_group WHERE ID = 3 )')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('g_id', 3)
             ->orWhereExists(function($query) {
-                $query->table('user_group')->where('id', 3);
+                $query->table('t_user_group')->where('id', 3);
             })
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // or where Not Exist
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id = 3 OR NOT EXISTS ( SELECT * FROM user_group WHERE ID = 3 )')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id = 3 OR NOT EXISTS ( SELECT * FROM t_user_group WHERE ID = 3 )')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('g_id', 3)
             ->orWhereNotExists(function($query) {
-                $query->table('user_group')->where('id', 3);
+                $query->table('t_user_group')->where('id', 3);
             })
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // more complex
-        $expect = self::$pdo->query('SELECT * FROM user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM user WHERE username = \'Jackie aa\' ) AND username = \'Jackie Conroy\' )')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM t_user WHERE username = \'Jackie aa\' ) AND username = \'Jackie Conroy\' )')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('username', 'Jackie aa')
             ->orWhereBrackets(function($query) {
                 $query->whereNotExists(function($query) {
-                    $query->table('user')->where('username', 'Jackie aa');
+                    $query->table('t_user')->where('username', 'Jackie aa');
                 })->where('username', 'Jackie Conroy');
             })
             ->get();
@@ -429,46 +429,46 @@ class PDODQLTest extends TestCase
     public function testWhereInSub()
     {
         // where in sub
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id IN ( SELECT id FROM user_group) ')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id IN ( SELECT id FROM t_user_group) ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereInSub('g_id', function($query) {
-                $query->table('user_group')->select('id');
+                $query->table('t_user_group')->select('id');
             })
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // where not in sub
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id NOT IN ( SELECT id FROM user_group) ')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id NOT IN ( SELECT id FROM t_user_group) ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->whereNotInSub('g_id', function($query) {
-                $query->table('user_group')->select('id');
+                $query->table('t_user_group')->select('id');
             })
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // or where in sub
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id != 1 OR g_id IN ( SELECT id FROM user_group) ')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id != 1 OR g_id IN ( SELECT id FROM t_user_group) ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('g_id', '!=', 1)
             ->orWhereInSub('g_id', function($query) {
-                $query->table('user_group')->select('id');
+                $query->table('t_user_group')->select('id');
             })
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // or where not in sub
-        $expect = self::$pdo->query('SELECT * FROM user WHERE g_id != 1 OR g_id NOT IN ( SELECT id FROM user_group) ')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE g_id != 1 OR g_id NOT IN ( SELECT id FROM t_user_group) ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('g_id', '!=', 1)
             ->orWhereNotInSub('g_id', function($query) {
-                $query->table('user_group')->select('id');
+                $query->table('t_user_group')->select('id');
             })
             ->get();
 
@@ -479,11 +479,11 @@ class PDODQLTest extends TestCase
     public function testFromSub()
     {
         // fromSub
-        $expect = self::$pdo->query('SELECT id, username, email FROM ( SELECT * FROM user WHERE id < 20 ) AS tb_1 ')
+        $expect = self::$pdo->query('SELECT id, username, email FROM ( SELECT * FROM t_user WHERE id < 20 ) AS tb_1 ')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->select('id', 'username', 'email')
             ->fromSub(function($query) {
-                $query->table('user')->where('id', '<', '20');
+                $query->table('t_user')->where('id', '<', '20');
             })
             ->get();
 
@@ -493,10 +493,10 @@ class PDODQLTest extends TestCase
 
     public function testGroupBy()
     {
-        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM user GROUP BY sort_num')
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->select('sort_num', 'COUNT(sort_num)')
             ->groupBy('sort_num')
             ->get();
@@ -508,10 +508,10 @@ class PDODQLTest extends TestCase
     public function testHaving()
     {
         // having 3 param
-        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM user GROUP BY sort_num HAVING COUNT(sort_num) < 20')
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) < 20')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->select('sort_num', 'COUNT(sort_num)')
             ->groupBy('sort_num')
             ->having('COUNT(sort_num)', '<', 20)
@@ -520,10 +520,10 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // having 2 param
-        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM user GROUP BY sort_num HAVING COUNT(sort_num) = 3')
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) = 3')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->select('sort_num', 'COUNT(sort_num)')
             ->groupBy('sort_num')
             ->having('COUNT(sort_num)', 3)
@@ -532,9 +532,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // having array param
-        $expect = self::$pdo->query('SELECT sort_num, activated FROM user GROUP BY sort_num, activated HAVING sort_num = 20 AND activated = 0')
+        $expect = self::$pdo->query('SELECT sort_num, activated FROM t_user GROUP BY sort_num, activated HAVING sort_num = 20 AND activated = 0')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->select('sort_num', 'activated')
             ->groupBy('sort_num')
             ->groupBy('activated')
@@ -544,9 +544,9 @@ class PDODQLTest extends TestCase
         $this->assertEquals($expect, $testResult);
 
         // or having
-        $expect = self::$pdo->query('SELECT sort_num, activated FROM user GROUP BY sort_num, activated HAVING sort_num = 20 OR sort_num = 50')
+        $expect = self::$pdo->query('SELECT sort_num, activated FROM t_user GROUP BY sort_num, activated HAVING sort_num = 20 OR sort_num = 50')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->select('sort_num', 'activated')
             ->groupBy('sort_num')
             ->groupBy('activated')
@@ -560,36 +560,36 @@ class PDODQLTest extends TestCase
     public function testOrderBy()
     {
         // order by
-        $expect = self::$pdo->query('SELECT * FROM user ORDER BY id')
+        $expect = self::$pdo->query('SELECT * FROM t_user ORDER BY id')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->orderBy('id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // desc
-        $expect = self::$pdo->query('SELECT * FROM user ORDER BY id DESC')
+        $expect = self::$pdo->query('SELECT * FROM t_user ORDER BY id DESC')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->orderBy('id', 'DESC')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // asc
-        $expect = self::$pdo->query('SELECT * FROM user ORDER BY id ASC')
+        $expect = self::$pdo->query('SELECT * FROM t_user ORDER BY id ASC')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->orderBy('id', 'ASC')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // order by more field
-        $expect = self::$pdo->query('SELECT * FROM user ORDER BY sort_num DESC, id ASC')
+        $expect = self::$pdo->query('SELECT * FROM t_user ORDER BY sort_num DESC, id ASC')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->orderBy('sort_num', 'DESC')
             ->orderBy('id', 'ASC')
             ->get();
@@ -600,9 +600,9 @@ class PDODQLTest extends TestCase
 
     public function testLimit()
     {
-        $expect = self::$pdo->query('SELECT * FROM user LIMIT 10 OFFSET 3')
+        $expect = self::$pdo->query('SELECT * FROM t_user LIMIT 10 OFFSET 3')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->limit(3, 10)
             ->get();
 
@@ -613,7 +613,7 @@ class PDODQLTest extends TestCase
     public function testPaginate()
     {
         $expect = [];
-        $expect['total']        = self::$pdo->query('SELECT COUNT(*) as count_num FROM user')
+        $expect['total']        = self::$pdo->query('SELECT COUNT(*) as count_num FROM t_user')
                 ->fetch(PDO::FETCH_ASSOC)['count_num'];
         $expect['per_page']     = 10;
         $expect['current_page'] = 2;
@@ -621,10 +621,10 @@ class PDODQLTest extends TestCase
         $expect['prev_page']    = 1;
         $expect['first_page']   = 1;
         $expect['last_page']    = $expect['total'] / 10;
-        $expect['data']         = self::$pdo->query('SELECT * FROM user LIMIT 10 OFFSET 10')
+        $expect['data']         = self::$pdo->query('SELECT * FROM t_user LIMIT 10 OFFSET 10')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->paginate(10, 2);
 
         $this->assertEquals($expect, $testResult);
@@ -633,30 +633,30 @@ class PDODQLTest extends TestCase
     public function testJoin()
     {
         // inner join
-        $expect = self::$pdo->query('SELECT * FROM user INNER JOIN user_group ON user.g_id = user_group.id')
+        $expect = self::$pdo->query('SELECT * FROM t_user INNER JOIN t_user_group ON t_user.g_id = t_user_group.id')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
-            ->join('user_group', 'user.g_id', 'user_group.id')
+        $testResult = self::$db->table('t_user')
+            ->join('t_user_group', 't_user.g_id', 't_user_group.id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // left join
-        $expect = self::$pdo->query('SELECT user.username, user_group.groupname FROM user LEFT JOIN user_group ON user.g_id = user_group.id')
+        $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname FROM t_user LEFT JOIN t_user_group ON t_user.g_id = t_user_group.id')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
-            ->select('user.username', 'user_group.groupname')
-            ->leftJoin('user_group', 'user.g_id', 'user_group.id')
+        $testResult = self::$db->table('t_user')
+            ->select('t_user.username', 't_user_group.groupname')
+            ->leftJoin('t_user_group', 't_user.g_id', 't_user_group.id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // right join
-        $expect = self::$pdo->query('SELECT user.username, user_group.groupname FROM user RIGHT JOIN user_group ON user.g_id = user_group.id')
+        $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname FROM t_user RIGHT JOIN t_user_group ON t_user.g_id = t_user_group.id')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
-            ->select('user.username', 'user_group.groupname')
-            ->rightJoin('user_group', 'user.g_id', 'user_group.id')
+        $testResult = self::$db->table('t_user')
+            ->select('t_user.username', 't_user_group.groupname')
+            ->rightJoin('t_user_group', 't_user.g_id', 't_user_group.id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
@@ -665,52 +665,52 @@ class PDODQLTest extends TestCase
     public function testComplex()
     {
         // sub query with join
-        $expect = self::$pdo->query('SELECT user.username, user_group.groupname FROM user LEFT JOIN user_group ON user.g_id = user_group.id WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM user WHERE username = \'Jackie aa\' ) AND username = \'Jackie Conroy\' )')
+        $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname FROM t_user LEFT JOIN t_user_group ON t_user.g_id = t_user_group.id WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM t_user WHERE username = \'Jackie aa\' ) AND username = \'Jackie Conroy\' )')
                 ->fetchAll(PDO::FETCH_ASSOC);
 
-        $testResult = self::$db->table('user')
-            ->select('user.username', 'user_group.groupname')
-            ->leftJoin('user_group', 'user.g_id', 'user_group.id')
-            ->where('user.username', 'Jackie aa')
+        $testResult = self::$db->table('t_user')
+            ->select('t_user.username', 't_user_group.groupname')
+            ->leftJoin('t_user_group', 't_user.g_id', 't_user_group.id')
+            ->where('t_user.username', 'Jackie aa')
             ->orWhereBrackets(function($query) {
                 $query->whereNotExists(function($query) {
-                    $query->table('user')->where('username', 'Jackie aa');
-                })->where('user.username', 'Jackie Conroy');
+                    $query->table('t_user')->where('username', 'Jackie aa');
+                })->where('t_user.username', 'Jackie Conroy');
             })
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // group by with join
-        $expect = self::$pdo->query('SELECT user.sort_num, COUNT(*) FROM user INNER JOIN user_group ON user.g_id = user_group.id WHERE user.activated <> 0 GROUP BY user.sort_num HAVING user.sort_num = 20 OR user.sort_num = 50 ORDER BY user.sort_num DESC')
+        $expect = self::$pdo->query('SELECT t_user.sort_num, COUNT(*) FROM t_user INNER JOIN t_user_group ON t_user.g_id = t_user_group.id WHERE t_user.activated <> 0 GROUP BY t_user.sort_num HAVING t_user.sort_num = 20 OR t_user.sort_num = 50 ORDER BY t_user.sort_num DESC')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
-            ->select('user.sort_num', 'COUNT(*)')
-            ->join('user_group', 'user.g_id', 'user_group.id')
-            ->where('user.activated', '<>', 0)
-            ->groupBy('user.sort_num')
-            ->having('user.sort_num', '50')
-            ->orHaving('user.sort_num', '20')
-            ->orderBy('user.sort_num', 'DESC')
+        $testResult = self::$db->table('t_user')
+            ->select('t_user.sort_num', 'COUNT(*)')
+            ->join('t_user_group', 't_user.g_id', 't_user_group.id')
+            ->where('t_user.activated', '<>', 0)
+            ->groupBy('t_user.sort_num')
+            ->having('t_user.sort_num', '50')
+            ->orHaving('t_user.sort_num', '20')
+            ->orderBy('t_user.sort_num', 'DESC')
             ->get();
 
         $this->assertEquals($expect, $testResult);
 
         // more complex
-        $expect = self::$pdo->query('SELECT * FROM user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM user WHERE username = \'Jackie aa\' ) AND (username = \'Jackie Conroy\' OR username = \'Jammie Haag\')) AND g_id IN ( SELECT id FROM user_group) ORDER BY id DESC LIMIT 1 OFFSET 0 ')
+        $expect = self::$pdo->query('SELECT * FROM t_user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM t_user WHERE username = \'Jackie aa\' ) AND (username = \'Jackie Conroy\' OR username = \'Jammie Haag\')) AND g_id IN ( SELECT id FROM t_user_group) ORDER BY id DESC LIMIT 1 OFFSET 0 ')
                 ->fetchAll(PDO::FETCH_ASSOC);
-        $testResult = self::$db->table('user')
+        $testResult = self::$db->table('t_user')
             ->where('username', 'Jackie aa')
             ->orWhereBrackets(function($query) {
                 $query->whereNotExists(function($query) {
-                    $query->table('user')->where('username', 'Jackie aa');
+                    $query->table('t_user')->where('username', 'Jackie aa');
                 })->WhereBrackets(function($query) {
                     $query->where('username', 'Jackie Conroy')
                           ->orWhere('username', 'Jammie Haag');
                 });
             })
             ->whereInSub('g_id', function($query) {
-                $query->table('user_group')->select('id');
+                $query->table('t_user_group')->select('id');
             })
             ->orderBy('id', 'DESC')
             ->limit(0, 1)

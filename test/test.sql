@@ -1,6 +1,6 @@
 
 -- mysql
-CREATE TABLE `user` (
+CREATE TABLE `t_user` (
     `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '自增 ID',
     `g_id` int unsigned NOT NULL COMMENT '用户组 ID',
     `username` varchar(40) NOT NULL COMMENT '用户名',
@@ -12,9 +12,18 @@ CREATE TABLE `user` (
     KEY (`g_id`)
 )ENGINE=InnoDB CHARSET=utf8;
 
-CREATE TABLE `user_group` (
+CREATE TABLE `t_user_group` (
     `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '自增 ID',
+    `c_id` int unsigned NOT NULL COMMENT '公司 ID',
     `groupname` varchar(40) NOT NULL COMMENT '用户组名',
+    `sort_num` int unsigned NOT NULL COMMENT '排序字段',
+    `created` int unsigned NOT NULL COMMENT '时间',
+    PRIMARY KEY (`id`)
+)ENGINE=InnoDB CHARSET=utf8;
+
+CREATE TABLE `t_company` (
+    `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT '自增 ID',
+    `companyname` varchar(40) NOT NULL COMMENT '公司名',
     `sort_num` int unsigned NOT NULL COMMENT '排序字段',
     `created` int unsigned NOT NULL COMMENT '时间',
     PRIMARY KEY (`id`)
@@ -22,20 +31,31 @@ CREATE TABLE `user_group` (
 
 -- postgresql
 
-CREATE TABLE "user" (
+CREATE TABLE t_user (
    id int NOT NULL,
    g_id int NOT NULL,
    username varchar(40) NOT NULL,
    email varchar(150) NOT NULL,
    sort_num int NOT NULL,
-   activated smallint NOT NULL,
+   activated smallint NOT NULL DEFAULT 0,
+   created int NOT NULL,
+   PRIMARY KEY (id)
+);
+CREATE INDEX index_g_id
+ON t_user (g_id);
+
+CREATE TABLE t_user_group (
+   id int NOT NULL,
+   c_id int NOT NULL,
+   groupname varchar(40) NOT NULL,
+   sort_num int NOT NULL,
    created int NOT NULL,
    PRIMARY KEY (id)
 );
 
-CREATE TABLE "user_group" (
+CREATE TABLE t_company (
    id int NOT NULL,
-   groupname varchar(40) NOT NULL,
+   companyname varchar(40) NOT NULL,
    sort_num int NOT NULL,
    created int NOT NULL,
    PRIMARY KEY (id)

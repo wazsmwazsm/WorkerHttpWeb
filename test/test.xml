@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <dataset>
-    <table name="user">
+    <table name="t_user">
         <column>id</column>
         <column>g_id</column>
         <column>username</column>
@@ -999,12 +999,14 @@
         	<value>1511946237</value>
         </row>
     </table>
-    <table name="user_group">
+    <table name="t_user_group">
         <column>id</column>
+        <column>c_id</column>
         <column>groupname</column>
         <column>sort_num</column>
         <column>created</column>
         <row>
+            <value>1</value>
             <value>1</value>
             <value>employee</value>
             <value>50</value>
@@ -1012,21 +1014,48 @@
         </row>
         <row>
             <value>2</value>
+            <value>2</value>
             <value>director</value>
             <value>51</value>
             <value>1510908855</value>
         </row>
         <row>
             <value>3</value>
+            <value>2</value>
             <value>artisan</value>
             <value>52</value>
             <value>1510909312</value>
         </row>
         <row>
             <value>4</value>
+            <value>1</value>
             <value>someone</value>
             <value>53</value>
             <value>1510909322</value>
+        </row>
+    </table>
+    <table name="t_company">
+        <column>id</column>
+        <column>companyname</column>
+        <column>sort_num</column>
+        <column>created</column>
+        <row>
+            <value>1</value>
+            <value>IBM</value>
+            <value>50</value>
+            <value>1510917222</value>
+        </row>
+        <row>
+            <value>2</value>
+            <value>Microsoft</value>
+            <value>51</value>
+            <value>1510918888</value>
+        </row>
+        <row>
+            <value>3</value>
+            <value>Oracle</value>
+            <value>51</value>
+            <value>1510919011</value>
         </row>
     </table>
 </dataset>
