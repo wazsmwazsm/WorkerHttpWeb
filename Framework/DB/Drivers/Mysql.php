@@ -19,6 +19,17 @@ class Mysql extends PDODriver implements ConnectorInterface
     protected static $_escape_symbol = '`';
 
     /**
+     * operators
+     *
+     * @var array
+     */
+    protected $_operators = [
+      '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
+      'like', 'not like', 'like binary', 'rlike', 'regexp', 'not regexp',
+      '&', '|', '^', '<<', '>>',
+    ];
+
+    /**
      * create a PDO instance
      *
      * @return  void

@@ -40,6 +40,17 @@ class PDODriver implements ConnectorInterface
     protected $_config = [];
 
     /**
+     * operators
+     *
+     * @var array
+     */
+    protected $_operators = [
+      '=', '<', '>', '<=', '>=', '<>', '!=',
+      'like', 'not like',
+      '&', '|', '<<', '>>',
+    ];
+
+    /**
      * build attribute list
      *
      * @var array
@@ -443,15 +454,19 @@ class PDODriver implements ConnectorInterface
               $construct_str = substr($construct_str, 0, strrpos($construct_str, 'AND'));
               $construct_str .= ')';
               break;
-          // ('a', 10) : a = 10 mode
+          // ('a', 10) : a = 10 mode or ('a', null) : a is null mode
           case 2:
               $plh = self::_getPlh();
-              $construct_str .= ' '.self::_backquote($params[0]).' = '.$plh.' ';
+              $operator = ' = ';
+              if(is_null($params[1])) {
+                  $operator = ' IS ';
+              }
+              $construct_str .= ' '.self::_backquote($params[0]).$operator.$plh.' ';
               $this->_bind_params[$plh] = $params[1];
               break;
-          // ('a', '>', 10) : a > 10 mode
+          // ('a', '>', 10) : a > 10 mode \ ('name', 'like', '%adam%') : name like '%adam%' mode
           case 3:
-              if( ! in_array($params[1], ['<', '>', '<=', '>=', '=', '!=', '<>'])) {
+              if( ! in_array(strtolower($params[1]), $this->_operators)) {
                   throw new \InvalidArgumentException('Confusing Symbol '.$params[1]);
               }
               $plh = self::_getPlh();

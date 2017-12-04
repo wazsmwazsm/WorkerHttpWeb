@@ -207,6 +207,8 @@ class PDODQLTest extends TestCase
 
         $this->assertEquals($expect, $testResult);
 
+        // where like
+
     }
 
     public function testWhereIn()
