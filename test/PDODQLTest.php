@@ -696,6 +696,20 @@ class PDODQLTest extends TestCase
 
         $this->assertEquals($expect, $testResult);
 
+        // multi join
+        $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname, t_company.companyname FROM t_company LEFT JOIN t_user_group ON t_user_group.c_id = t_company.id LEFT JOIN t_user ON t_user.g_id = t_user_group.id ORDER BY t_user.sort_num ASC, t_user.id DESC LIMIT 25 offset 10')
+                ->fetchAll(PDO::FETCH_ASSOC);
+        $testResult = self::$db->table('t_company')
+            ->select('t_user.username', 't_user_group.groupname', 't_company.companyname')
+            ->leftJoin('t_user_group', 't_user_group.c_id', 't_company.id')
+            ->leftJoin('t_user', 't_user.g_id', 't_user_group.id')
+            ->orderBy('t_user.sort_num', 'ASC')
+            ->orderBy('t_user.id', 'DESC')
+            ->limit(10, 25)
+            ->get();
+
+        $this->assertEquals($expect, $testResult);
+
         // more complex
         $expect = self::$pdo->query('SELECT * FROM t_user WHERE username = \'Jackie aa\' OR ( NOT EXISTS ( SELECT * FROM t_user WHERE username = \'Jackie aa\' ) AND (username = \'Jackie Conroy\' OR username = \'Jammie Haag\')) AND g_id IN ( SELECT id FROM t_user_group) ORDER BY id DESC LIMIT 1 OFFSET 0 ')
                 ->fetchAll(PDO::FETCH_ASSOC);
