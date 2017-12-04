@@ -19,6 +19,6 @@ class MysqlDMLTest extends PDODMLTest
             self::$db = new Mysql('localhost', '3306', 'homestead', 'secret', 'test', 'utf8');
         }
 
-        return $this->createDefaultDBConnection(self::$pdo, ':memory:');
+        return $this->createDefaultDBConnection(self::$pdo, $dsn);
     }
 }
