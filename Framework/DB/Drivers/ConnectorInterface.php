@@ -9,18 +9,13 @@ use Closure;
 interface ConnectorInterface
 {
 
-    /**
-     * construct , create a db connection
-     *
-     * @param string $host
-     * @param string $port
-     * @param string $user
-     * @param string $password
-     * @param string $dbname
-     * @param string $charset
-     * @return  void
-     * @throws  \PDOException
-     */
+  /**
+   * construct , create a db connection
+   *
+   * @param string $config
+   * @return  void
+   * @throws  \PDOException
+   */
     public function __construct($config);
 
     /**

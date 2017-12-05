@@ -174,12 +174,7 @@ class PDODriver implements ConnectorInterface
     /**
      * construct , create a db connection
      *
-     * @param string $host
-     * @param string $port
-     * @param string $user
-     * @param string $password
-     * @param string $dbname
-     * @param string $charset
+     * @param string $config
      * @return  void
      * @throws  \PDOException
      */

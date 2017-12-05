@@ -32,16 +32,10 @@ class DB
             try {
                 switch (strtolower($db_conf['driver'])) {
                     case 'mysql':
-                        self::$_connections[$con_name] = new Mysql
-                        (
-                            $db_conf['host'], $db_conf['port'], $db_conf['user'], $db_conf['password'], $db_conf['dbname'], $db_conf['charset']
-                        );
+                        self::$_connections[$con_name] = new Mysql($db_conf);
                         break;
                     case 'pgsql':
-                        self::$_connections[$con_name] = new Pgsql
-                        (
-                            $db_conf['host'], $db_conf['port'], $db_conf['user'], $db_conf['password'], $db_conf['dbname'], $db_conf['charset']
-                        );
+                        self::$_connections[$con_name] = new Pgsql($db_conf);
                         break;
                     default:
                         break;
