@@ -21,7 +21,15 @@ class PgsqlDMLTest extends PDODMLTest
         }
         // 待测的 mysql 对象
         if (self::$db == null) {
-            self::$db = new Pgsql('localhost', '5432', 'homestead', 'secret', 'test', 'utf8');
+            $config = [
+              'host'     => 'localhost',
+              'port'     => '5432',
+              'user'     => 'homestead',
+              'password' => 'secret',
+              'dbname'   => 'test',
+              'charset'  => 'utf8',
+            ];
+            self::$db = new Pgsql($config);
         }
 
         return $this->createDefaultDBConnection(self::$pdo, $dsn);

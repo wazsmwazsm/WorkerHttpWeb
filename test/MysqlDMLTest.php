@@ -22,7 +22,16 @@ class MysqlDMLTest extends PDODMLTest
         }
         // 待测的 mysql 对象
         if (self::$db == null) {
-            self::$db = new Mysql('localhost', '3306', 'homestead', 'secret', 'test', 'utf8');
+            $config = [
+              'host'     => 'localhost',
+              'port'     => '3306',
+              'user'     => 'homestead',
+              'password' => 'secret',
+              'dbname'   => 'test',
+              'charset'  => 'utf8',
+            ];
+
+            self::$db = new Mysql($config);
         }
 
         return $this->createDefaultDBConnection(self::$pdo, $dsn);

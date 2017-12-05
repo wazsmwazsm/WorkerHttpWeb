@@ -17,7 +17,16 @@ class PgsqlDQLTest extends PDODQLTest
         self::$pdo = new PDO($dsn, 'homestead', 'secret', $options);
         self::$pdo->prepare("set names 'utf8'")->execute();
         // 被测对象
-        self::$db = new Pgsql('localhost', '5432', 'homestead', 'secret', 'test', 'utf8');
+        $config = [
+          'host'     => 'localhost',
+          'port'     => '5432',
+          'user'     => 'homestead',
+          'password' => 'secret',
+          'dbname'   => 'test',
+          'charset'  => 'utf8',
+          'schema'   => 'public',
+        ];
+        self::$db = new Pgsql($config);
     }
 
 }

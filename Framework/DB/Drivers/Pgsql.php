@@ -50,18 +50,29 @@ class Pgsql extends PDODriver implements ConnectorInterface
      */
     protected function _connect()
     {
-        $dsn = 'pgsql:dbname='.$this->_config['dbname'].
-               ';host='.$this->_config['host'].
-               ';port='.$this->_config['port'];
+        extract($this->_config, EXTR_SKIP);
+
+        $dsn = 'pgsql:dbname='.$dbname.
+               ';host='.$host.
+               ';port='.$port;
+
+        $options = isset($options) ? $options + $this->_options : $this->_options;
+
         try {
             $this->_pdo = new PDO(
                 $dsn,
-                $this->_config['user'],
-                $this->_config['password'],
-                $this->_getOptions()
+                $user,
+                $password,
+                $options
             );
-
-            $this->_pdo->prepare("set names '{$this->_config['charset']}'")->execute();
+            // charset set
+            if(isset($charset)) {
+                $this->_pdo->prepare("set names '$charset'")->execute();
+            }
+            // set schema path
+            if(isset($schema)) {
+                $this->_pdo->prepare("set search_path to $schema")->execute();
+            }
 
         } catch (PDOException $e) {
             throw $e;

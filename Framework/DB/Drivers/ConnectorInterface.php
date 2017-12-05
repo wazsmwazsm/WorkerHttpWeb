@@ -21,7 +21,7 @@ interface ConnectorInterface
      * @return  void
      * @throws  \PDOException
      */
-    public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8');
+    public function __construct($config);
 
     /**
      * set table

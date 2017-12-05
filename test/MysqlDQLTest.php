@@ -18,7 +18,15 @@ class MysqlDQLTest extends PDODQLTest
         self::$pdo = new PDO($dsn, 'homestead', 'secret', $options);
         self::$pdo->prepare('set names utf8')->execute();
         // 被测对象
-        self::$db = new Mysql('localhost', '3306', 'homestead', 'secret', 'test', 'utf8');
+        $config = [
+          'host'     => 'localhost',
+          'port'     => '3306',
+          'user'     => 'homestead',
+          'password' => 'secret',
+          'dbname'   => 'test',
+          'charset'  => 'utf8',
+        ];
+        self::$db = new Mysql($config);
     }
 
 }

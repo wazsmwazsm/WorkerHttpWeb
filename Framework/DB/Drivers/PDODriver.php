@@ -183,17 +183,10 @@ class PDODriver implements ConnectorInterface
      * @return  void
      * @throws  \PDOException
      */
-    public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8', $options = [])
+    public function __construct($config)
     {
-        $this->_config = [
-            'host'     => $host,
-            'port'     => $port,
-            'user'     => $user,
-            'password' => $password,
-            'dbname'   => $dbname,
-            'charset'  => $charset,
-            'options'  => $options,
-        ];
+        $this->_config = $config;
+
         $this->_connect();
     }
 
@@ -205,32 +198,25 @@ class PDODriver implements ConnectorInterface
      */
     protected function _connect()
     {
-        $dsn = 'mysql:dbname='.$this->_config['dbname'].
-               ';host='.$this->_config['host'].
-               ';port='.$this->_config['port'];
+        extract($this->_config, EXTR_SKIP);
+
+        $dsn = 'mysql:dbname='.$dbname.
+               ';host='.$host.
+               ';port='.$port;
+
+        $options = isset($options) ? $options + $this->_options : $this->_options;
 
         try {
             $this->_pdo = new PDO(
                 $dsn,
-                $this->_config['user'],
-                $this->_config['password'],
-                $this->_getOptions()
+                $user,
+                $password,
+                $options
             );
 
         } catch (PDOException $e) {
             throw $e;
         }
-    }
-
-    /**
-     * create PDO options
-     *
-     * @return  array
-     */
-    protected function _getOptions()
-    {
-        // The array index will be changed when use array_merge
-        return $this->_config['options'] + $this->_options;
     }
 
     /**
