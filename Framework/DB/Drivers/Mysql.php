@@ -39,19 +39,17 @@ class Mysql extends PDODriver implements ConnectorInterface
     {
         $dsn = 'mysql:dbname='.$this->_config['dbname'].
                ';host='.$this->_config['host'].
-               ';port='.$this->_config['port'];
-
+               ';port='.$this->_config['port'].
+               ';charset='.$this->_config['charset'];
         try {
             $this->_pdo = new PDO(
                 $dsn,
                 $this->_config['user'],
                 $this->_config['password'],
-                [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset']]
+                $this->_getOptions()
             );
-            // set error mode
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            // disables emulation of prepared statements
-            $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+
+            $this->_pdo->prepare('set names '.$this->_config['charset'])->execute();
 
         } catch (PDOException $e) {
             throw $e;

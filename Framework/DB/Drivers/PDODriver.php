@@ -51,6 +51,19 @@ class PDODriver implements ConnectorInterface
     ];
 
     /**
+     * The default PDO connection options.
+     *
+     * @var array
+     */
+    protected $_options = [
+        PDO::ATTR_CASE => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_STRINGIFY_FETCHES => FALSE,
+        PDO::ATTR_EMULATE_PREPARES => FALSE,
+    ];
+
+    /**
      * build attribute list
      *
      * @var array
@@ -170,7 +183,7 @@ class PDODriver implements ConnectorInterface
      * @return  void
      * @throws  \PDOException
      */
-    public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8')
+    public function __construct($host, $port, $user, $password, $dbname, $charset = 'utf8', $options = [])
     {
         $this->_config = [
             'host'     => $host,
@@ -179,6 +192,7 @@ class PDODriver implements ConnectorInterface
             'password' => $password,
             'dbname'   => $dbname,
             'charset'  => $charset,
+            'options'  => $options,
         ];
         $this->_connect();
     }
@@ -200,16 +214,23 @@ class PDODriver implements ConnectorInterface
                 $dsn,
                 $this->_config['user'],
                 $this->_config['password'],
-                [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$this->_config['charset']]
+                $this->_getOptions()
             );
-            // set error mode
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            // disables emulation of prepared statements
-            $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
 
         } catch (PDOException $e) {
             throw $e;
         }
+    }
+
+    /**
+     * create PDO options
+     *
+     * @return  array
+     */
+    protected function _getOptions()
+    {
+        // The array index will be changed when use array_merge
+        return $this->_config['options'] + $this->_options;
     }
 
     /**
@@ -455,7 +476,7 @@ class PDODriver implements ConnectorInterface
               $construct_str .= ')';
               break;
           // ('a', 10) : a = 10 mode or ('a', null) : a is null mode
-          case 2:              
+          case 2:
               if(is_null($params[1])) {
                   $construct_str .= ' '.self::_backquote($params[0]).' IS NULL ';
               } else {
@@ -581,7 +602,7 @@ class PDODriver implements ConnectorInterface
      */
     public function getTable()
     {
-        return trim($this->_table, '"`');
+        return preg_replace('/[\"|\`]+/', '', $this->_table);
     }
 
     /**

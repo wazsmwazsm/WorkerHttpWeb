@@ -8,9 +8,14 @@ class PgsqlDQLTest extends PDODQLTest
     {
         // 新建 pdo 对象, 用于测试被测驱动
         $dsn = 'pgsql:dbname=test;host=localhost;port=5432';
-        self::$pdo = new PDO($dsn, 'homestead', 'secret');
-        self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        self::$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+        $options = [
+            PDO::ATTR_CASE => PDO::CASE_NATURAL,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+            PDO::ATTR_STRINGIFY_FETCHES => false,
+        ];
+        self::$pdo = new PDO($dsn, 'homestead', 'secret', $options);
+        self::$pdo->prepare("set names 'utf8'")->execute();
         // 被测对象
         self::$db = new Pgsql('localhost', '5432', 'homestead', 'secret', 'test', 'utf8');
     }

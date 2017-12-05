@@ -31,6 +31,18 @@ class Pgsql extends PDODriver implements ConnectorInterface
     ];
 
     /**
+     * The default PDO connection options.
+     *
+     * @var array
+     */
+    protected $_options = [
+        PDO::ATTR_CASE => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+    ];
+
+    /**
      * create a PDO instance
      *
      * @return  void
@@ -41,17 +53,15 @@ class Pgsql extends PDODriver implements ConnectorInterface
         $dsn = 'pgsql:dbname='.$this->_config['dbname'].
                ';host='.$this->_config['host'].
                ';port='.$this->_config['port'];
-
         try {
             $this->_pdo = new PDO(
                 $dsn,
                 $this->_config['user'],
-                $this->_config['password']
+                $this->_config['password'],
+                $this->_getOptions()
             );
-            // set error mode
-            $this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            // disables emulation of prepared statements
-            $this->_pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, FALSE);
+
+            $this->_pdo->prepare("set names '{$this->_config['charset']}'")->execute();
 
         } catch (PDOException $e) {
             throw $e;

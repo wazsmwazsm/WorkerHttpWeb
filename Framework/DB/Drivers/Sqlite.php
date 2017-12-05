@@ -41,10 +41,11 @@ class Sqlite extends PDODriver implements ConnectorInterface
      * @return  void
      * @throws  \PDOException
      */
-    public function __construct($dbpath = ':memory:')
+    public function __construct($dbpath = ':memory:', $options = [])
     {
         $this->_config = [
             'dbpath' => $dbpath,
+            'options' => $options,
         ];
 
         $this->_connect();
