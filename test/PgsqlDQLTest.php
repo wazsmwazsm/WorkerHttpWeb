@@ -25,6 +25,7 @@ class PgsqlDQLTest extends PDODQLTest
           'dbname'   => 'test',
           'charset'  => 'utf8',
           'schema'   => 'public',
+          'prefix'   => 't_',
         ];
         self::$db = new Pgsql($config);
     }

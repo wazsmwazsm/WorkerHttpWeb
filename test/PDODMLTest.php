@@ -22,8 +22,7 @@ class PDODMLTest extends TestCase
 
     public function testSetGetTable()
     {
-        $table = 't_user';
-        $this->assertEquals($table, self::$db->table($table)->getTable());
+        $this->assertEquals('t_user', self::$db->table('user')->getTable());
     }
 
 }

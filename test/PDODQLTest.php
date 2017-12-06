@@ -657,7 +657,7 @@ class PDODQLTest extends TestCase
         $expect = self::$pdo->query('SELECT * FROM t_user INNER JOIN t_user_group ON t_user.g_id = t_user_group.id')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->table('user')
-            ->join('t_user_group', 't_user.g_id', 't_user_group.id')
+            ->join('user_group', 'user.g_id', 'user_group.id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
@@ -666,8 +666,8 @@ class PDODQLTest extends TestCase
         $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname FROM t_user LEFT JOIN t_user_group ON t_user.g_id = t_user_group.id')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->table('user')
-            ->select('t_user.username', 't_user_group.groupname')
-            ->leftJoin('t_user_group', 't_user.g_id', 't_user_group.id')
+            ->select('user.username', 'user_group.groupname')
+            ->leftJoin('user_group', 'user.g_id', 'user_group.id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
@@ -676,8 +676,8 @@ class PDODQLTest extends TestCase
         $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname FROM t_user RIGHT JOIN t_user_group ON t_user.g_id = t_user_group.id')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->table('user')
-            ->select('t_user.username', 't_user_group.groupname')
-            ->rightJoin('t_user_group', 't_user.g_id', 't_user_group.id')
+            ->select('user.username', 'user_group.groupname')
+            ->rightJoin('user_group', 'user.g_id', 'user_group.id')
             ->get();
 
         $this->assertEquals($expect, $testResult);
@@ -690,13 +690,13 @@ class PDODQLTest extends TestCase
                 ->fetchAll(PDO::FETCH_ASSOC);
 
         $testResult = self::$db->table('user')
-            ->select('t_user.username', 't_user_group.groupname')
-            ->leftJoin('t_user_group', 't_user.g_id', 't_user_group.id')
-            ->where('t_user.username', 'Jackie aa')
+            ->select('user.username', 'user_group.groupname')
+            ->leftJoin('user_group', 'user.g_id', 'user_group.id')
+            ->where('user.username', 'Jackie aa')
             ->orWhereBrackets(function($query) {
                 $query->whereNotExists(function($query) {
                     $query->table('user')->where('username', 'Jackie aa');
-                })->where('t_user.username', 'Jackie Conroy');
+                })->where('user.username', 'Jackie Conroy');
             })
             ->get();
 
@@ -706,13 +706,13 @@ class PDODQLTest extends TestCase
         $expect = self::$pdo->query('SELECT t_user.sort_num, COUNT(*) FROM t_user INNER JOIN t_user_group ON t_user.g_id = t_user_group.id WHERE t_user.activated <> 0 GROUP BY t_user.sort_num HAVING t_user.sort_num = 20 OR t_user.sort_num = 50 ORDER BY t_user.sort_num DESC')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->table('user')
-            ->select('t_user.sort_num', 'COUNT(*)')
-            ->join('t_user_group', 't_user.g_id', 't_user_group.id')
-            ->where('t_user.activated', '<>', 0)
-            ->groupBy('t_user.sort_num')
-            ->having('t_user.sort_num', '50')
-            ->orHaving('t_user.sort_num', '20')
-            ->orderBy('t_user.sort_num', 'DESC')
+            ->select('user.sort_num', 'COUNT(*)')
+            ->join('user_group', 'user.g_id', 'user_group.id')
+            ->where('user.activated', '<>', 0)
+            ->groupBy('user.sort_num')
+            ->having('user.sort_num', '50')
+            ->orHaving('user.sort_num', '20')
+            ->orderBy('user.sort_num', 'DESC')
             ->get();
 
         $this->assertEquals($expect, $testResult);
@@ -721,11 +721,11 @@ class PDODQLTest extends TestCase
         $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname, t_company.companyname FROM t_company LEFT JOIN t_user_group ON t_user_group.c_id = t_company.id LEFT JOIN t_user ON t_user.g_id = t_user_group.id ORDER BY t_user.sort_num ASC, t_user.id DESC LIMIT 25 offset 10')
                 ->fetchAll(PDO::FETCH_ASSOC);
         $testResult = self::$db->table('company')
-            ->select('t_user.username', 't_user_group.groupname', 't_company.companyname')
-            ->leftJoin('t_user_group', 't_user_group.c_id', 't_company.id')
-            ->leftJoin('t_user', 't_user.g_id', 't_user_group.id')
-            ->orderBy('t_user.sort_num', 'ASC')
-            ->orderBy('t_user.id', 'DESC')
+            ->select('user.username', 'user_group.groupname', 'company.companyname')
+            ->leftJoin('user_group', 'user_group.c_id', 'company.id')
+            ->leftJoin('user', 'user.g_id', 'user_group.id')
+            ->orderBy('user.sort_num', 'ASC')
+            ->orderBy('user.id', 'DESC')
             ->limit(10, 25)
             ->get();
 

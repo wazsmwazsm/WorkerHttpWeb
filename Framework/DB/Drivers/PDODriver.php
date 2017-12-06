@@ -70,7 +70,7 @@ class PDODriver implements ConnectorInterface
      */
     protected $_buildAttrs = [
       '_table',
-      '_query_sql',
+      '_prepare_sql',
       '_cols_str',
       '_where_str',
       '_orderby_str',
@@ -92,7 +92,7 @@ class PDODriver implements ConnectorInterface
      *
      * @var string
      */
-    protected $_query_sql = '';
+    protected $_prepare_sql = '';
 
     /**
      * sql sting
@@ -233,7 +233,7 @@ class PDODriver implements ConnectorInterface
     protected function _reset()
     {
         $this->_table = '';
-        $this->_query_sql = '';
+        $this->_prepare_sql = '';
         $this->_cols_str = ' * ';
         $this->_where_str = '';
         $this->_orderby_str = '';
@@ -254,7 +254,7 @@ class PDODriver implements ConnectorInterface
     protected function _resetBuildAttr()
     {
         $this->_table = '';
-        $this->_query_sql = '';
+        $this->_prepare_sql = '';
         $this->_cols_str = ' * ';
         $this->_where_str = '';
         $this->_orderby_str = '';
@@ -271,7 +271,7 @@ class PDODriver implements ConnectorInterface
      */
     protected function _buildQuery()
     {
-        $this->_query_sql = 'SELECT '.$this->_cols_str.' '.' FROM '.$this->_table.
+        $this->_prepare_sql = 'SELECT '.$this->_cols_str.' '.' FROM '.$this->_table.
             $this->_join_str.
             $this->_where_str.
             $this->_groupby_str.$this->_having_str.
@@ -286,7 +286,7 @@ class PDODriver implements ConnectorInterface
      */
     protected function _buildInsert()
     {
-        $this->_query_sql = 'INSERT INTO '.$this->_table.$this->_insert_str;
+        $this->_prepare_sql = 'INSERT INTO '.$this->_table.$this->_insert_str;
     }
 
     /**
@@ -296,7 +296,7 @@ class PDODriver implements ConnectorInterface
      */
     protected function _buildUpdate()
     {
-        $this->_query_sql = 'UPDATE '.$this->_table.$this->_update_str.$this->_where_str;
+        $this->_prepare_sql = 'UPDATE '.$this->_table.$this->_update_str.$this->_where_str;
     }
 
     /**
@@ -306,7 +306,22 @@ class PDODriver implements ConnectorInterface
      */
     protected function _buildDelete()
     {
-        $this->_query_sql = 'DELETE FROM '.$this->_table.$this->_where_str;
+        $this->_prepare_sql = 'DELETE FROM '.$this->_table.$this->_where_str;
+    }
+
+    /**
+     * wrap prepare sql
+     *
+     * @return  void
+     */
+    protected function _wrapPrepareSql()
+    {
+        // set table prefix
+        $escape = static::$_escape_symbol;
+        $prefix_pattern = '/'.$escape.'([a-zA-Z0-9_]+)'.$escape.'(\.)'.$escape.'([a-zA-Z0-9_]+)'.$escape.'/';
+        $prefix_replace = self::_escape($this->_wrapTable('$1')).'$2'.self::_escape('$3');
+
+        $this->_prepare_sql = preg_replace($prefix_pattern, $prefix_replace, $this->_prepare_sql);
     }
 
     /**
@@ -318,7 +333,8 @@ class PDODriver implements ConnectorInterface
     protected function _execute()
     {
         try {
-            $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+            $this->_wrapPrepareSql();
+            $this->_pdoSt = $this->_pdo->prepare($this->_prepare_sql);
             $this->_bindParams();
             $this->_reset();  // memory-resident mode, singleton pattern, need reset build attr
             $this->_pdoSt->execute();
@@ -334,7 +350,8 @@ class PDODriver implements ConnectorInterface
                 $this->_connect();
                 // retry
                 try {
-                    $this->_pdoSt = $this->_pdo->prepare($this->_query_sql);
+                    $this->_wrapPrepareSql();
+                    $this->_pdoSt = $this->_pdo->prepare($this->_prepare_sql);
                     $this->_bindParams();
                     $this->_reset();
                     $this->_pdoSt->execute();
@@ -366,6 +383,20 @@ class PDODriver implements ConnectorInterface
                 $this->_pdoSt->bindValue($plh, $param);
             }
         }
+    }
+
+    /**
+     * set table prefix
+     *
+     * @param  string $table
+     * @return  string
+     */
+    protected function _wrapTable($table)
+    {
+        $prefix = array_key_exists('prefix', $this->_config) ?
+                $this->_config['prefix'] : '';
+
+        return $prefix.$table;
     }
 
     /**
@@ -571,7 +602,7 @@ class PDODriver implements ConnectorInterface
      */
     public function table($table)
     {
-        $this->_table = self::_backquote($table);
+        $this->_table = self::_backquote($this->_wrapTable($table));
 
         return $this;
     }
@@ -583,7 +614,8 @@ class PDODriver implements ConnectorInterface
      */
     public function getTable()
     {
-        return preg_replace('/[\"|\`]+/', '', $this->_table);
+        $pattern = '/['.static::$_escape_symbol.']+/';
+        return preg_replace($pattern, '', $this->_table);
     }
 
     /**
@@ -887,7 +919,7 @@ class PDODriver implements ConnectorInterface
         }
 
         $sub_attr = $this->_subBuilder($callback);
-        $this->_where_str .= $sub_attr['query_sql'].' ) ';
+        $this->_where_str .= $sub_attr['prepare_sql'].' ) ';
 
         return $this;
     }
@@ -951,7 +983,7 @@ class PDODriver implements ConnectorInterface
         }
 
         $sub_attr = $this->_subBuilder($callback);
-        $this->_where_str .= $sub_attr['query_sql'].' ) ';
+        $this->_where_str .= $sub_attr['prepare_sql'].' ) ';
 
         return $this;
     }
@@ -1094,6 +1126,8 @@ class PDODriver implements ConnectorInterface
         if( ! in_array($type, ['INNER', 'LEFT', 'RIGHT'])) {
             throw new \InvalidArgumentException("Error join mode");
         }
+        // set table prefix
+        $table = $this->_wrapTable($table);
         // create join string
         $this->_join_str .= ' '.$type.' JOIN '.self::_backquote($table).
             ' ON '.self::_backquote($one).' = '.self::_backquote($two);
@@ -1139,7 +1173,7 @@ class PDODriver implements ConnectorInterface
     public function fromSub(Closure $callback)
     {
         $sub_attr = $this->_subBuilder($callback);
-        $this->_table .= ' ( '.$sub_attr['query_sql'].' ) AS tb_'.uniqid().' ';
+        $this->_table .= ' ( '.$sub_attr['prepare_sql'].' ) AS tb_'.uniqid().' ';
 
         return $this;
     }

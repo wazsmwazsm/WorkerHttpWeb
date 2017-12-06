@@ -28,6 +28,7 @@ class PgsqlDMLTest extends PDODMLTest
               'password' => 'secret',
               'dbname'   => 'test',
               'charset'  => 'utf8',
+              'prefix'   => 't_',
             ];
             self::$db = new Pgsql($config);
         }
