@@ -54,7 +54,11 @@ class Mysql extends PDODriver implements ConnectorInterface
             );
             // charset set
             if(isset($charset)) {
-                $this->_pdo->prepare('set names '.$charset)->execute();
+                $this->_pdo->prepare("set names $charset")->execute();
+            }
+            // timezone
+            if(isset($timezone)) {
+                $this->_pdo->prepare("set time_zone='$timezone'")->execute();
             }
 
         } catch (PDOException $e) {
