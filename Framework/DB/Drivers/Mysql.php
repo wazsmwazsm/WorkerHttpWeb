@@ -41,7 +41,7 @@ class Mysql extends PDODriver implements ConnectorInterface
 
         $dsn = 'mysql:dbname='.$dbname.
                ';host='.$host.
-               ';port='.$port;
+               (isset($port) ? ';port='.$port : '');
 
         $options = isset($options) ? $options + $this->_options : $this->_options;
 
@@ -54,13 +54,20 @@ class Mysql extends PDODriver implements ConnectorInterface
             );
             // charset set
             if(isset($charset)) {
-                $this->_pdo->prepare("set names $charset")->execute();
+                $this->_pdo->prepare("set names $charset ".(isset($collation) ? " collate '$collation'" : ''))->execute();
             }
             // timezone
             if(isset($timezone)) {
                 $this->_pdo->prepare("set time_zone='$timezone'")->execute();
             }
-
+            // strict mode
+            if(isset($strict)) {
+                if($strict) {
+                    $this->_pdo->prepare("set session sql_mode='STRICT_ALL_TABLES'")->execute();
+                } else {
+                    $this->_pdo->prepare("set session sql_mode=''")->execute();
+                }
+            }
         } catch (PDOException $e) {
             throw $e;
         }

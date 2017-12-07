@@ -18,18 +18,23 @@ class MysqlDMLTest extends PDODMLTest
                 PDO::ATTR_EMULATE_PREPARES => FALSE,
             ];
             self::$pdo = new PDO($dsn, 'homestead', 'secret', $options);
-            self::$pdo->prepare('set names utf8')->execute();
+            self::$pdo->prepare('set names utf8 collate utf8_general_ci')->execute();
+            self::$pdo->prepare('set time_zone=\'+8:00\'')->execute();
+            self::$pdo->prepare("set session sql_mode=''")->execute();
         }
         // 待测的 mysql 对象
         if (self::$db == null) {
             $config = [
-              'host'     => 'localhost',
-              'port'     => '3306',
-              'user'     => 'homestead',
-              'password' => 'secret',
-              'dbname'   => 'test',
-              'charset'  => 'utf8',
-              'prefix'   => 't_',
+              'host'       => 'localhost',
+              'port'       => '3306',
+              'user'       => 'homestead',
+              'password'   => 'secret',
+              'dbname'     => 'test',
+              'charset'    => 'utf8',
+              'prefix'     => 't_',
+              'timezone'   => '+8:00',
+              'collection' => 'utf8_general_ci',
+              'strict'     => false,
             ];
 
             self::$db = new Mysql($config);

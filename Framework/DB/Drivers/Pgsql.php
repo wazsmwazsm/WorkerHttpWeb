@@ -53,8 +53,9 @@ class Pgsql extends PDODriver implements ConnectorInterface
         extract($this->_config, EXTR_SKIP);
 
         $dsn = 'pgsql:dbname='.$dbname.
-               ';host='.$host.
-               ';port='.$port;
+               (isset($host) ? ';host='.$host : '').
+               (isset($port) ? ';port='.$port : '').
+               (isset($sslmode) ? ';sslmode='.$sslmode : '');
 
         $options = isset($options) ? $options + $this->_options : $this->_options;
 
@@ -71,13 +72,16 @@ class Pgsql extends PDODriver implements ConnectorInterface
             }
             // timezone
             if(isset($timezone)) {
-                $this->_pdo->prepare("set time_zone='$timezone'")->execute();
+                $this->_pdo->prepare("set time zone '$timezone'")->execute();
             }
             // set schema path
             if(isset($schema)) {
                 $this->_pdo->prepare("set search_path to $schema")->execute();
             }
-
+            // set application name
+            if(isset($application_name)) {
+                $this->_pdo->prepare("set application_name to '$applicationName'")->execute();
+            }
         } catch (PDOException $e) {
             throw $e;
         }

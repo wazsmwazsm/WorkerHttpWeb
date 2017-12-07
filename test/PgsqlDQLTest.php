@@ -16,6 +16,8 @@ class PgsqlDQLTest extends PDODQLTest
         ];
         self::$pdo = new PDO($dsn, 'homestead', 'secret', $options);
         self::$pdo->prepare("set names 'utf8'")->execute();
+        self::$pdo->prepare('set time zone \'+8:00\'')->execute();
+
         // 被测对象
         $config = [
           'host'     => 'localhost',
@@ -26,6 +28,7 @@ class PgsqlDQLTest extends PDODQLTest
           'charset'  => 'utf8',
           'schema'   => 'public',
           'prefix'   => 't_',
+          'timezone' => '+8:00',
         ];
         self::$db = new Pgsql($config);
     }

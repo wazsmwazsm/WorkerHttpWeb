@@ -18,6 +18,7 @@ class PgsqlDMLTest extends PDODMLTest
             ];
             self::$pdo = new PDO($dsn, 'homestead', 'secret', $options);
             self::$pdo->prepare("set names 'utf8'")->execute();
+            self::$pdo->prepare('set time zone \'+8:00\'')->execute();
         }
         // 待测的 mysql 对象
         if (self::$db == null) {
@@ -29,6 +30,7 @@ class PgsqlDMLTest extends PDODMLTest
               'dbname'   => 'test',
               'charset'  => 'utf8',
               'prefix'   => 't_',
+              'timezone' => '+8:00',
             ];
             self::$db = new Pgsql($config);
         }
