@@ -202,12 +202,8 @@ class PDODriver implements ConnectorInterface
         $options = isset($options) ? $options + $this->_options : $this->_options;
 
         try {
-            $this->_pdo = new PDO(
-                $dsn,
-                $user,
-                $password,
-                $options
-            );
+
+            $this->_pdo = new PDO($dsn, $user, $password, $options);
 
         } catch (PDOException $e) {
             throw $e;
@@ -1084,6 +1080,19 @@ class PDODriver implements ConnectorInterface
         }
         // build attribute, bind params
         $this->_condition_constructor(func_num_args(), func_get_args(), $this->_having_str);
+
+        return $this;
+    }
+
+    /**
+     * build having string raw
+     *
+     * @param   $string
+     * @return  self
+     */
+    public function havingRaw($string)
+    {
+        $this->_having_str = ' HAVING '.$string.' ';
 
         return $this;
     }

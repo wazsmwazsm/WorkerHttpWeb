@@ -46,12 +46,9 @@ class Mysql extends PDODriver implements ConnectorInterface
         $options = isset($options) ? $options + $this->_options : $this->_options;
 
         try {
-            $this->_pdo = new PDO(
-                $dsn,
-                $user,
-                $password,
-                $options
-            );
+
+            $this->_pdo = new PDO($dsn, $user, $password, $options);
+            
             // charset set
             if(isset($charset)) {
                 $this->_pdo->prepare("set names $charset ".(isset($collation) ? " collate '$collation'" : ''))->execute();

@@ -272,6 +272,14 @@ interface ConnectorInterface
     public function having();
 
     /**
+     * build having string raw
+     *
+     * @param   $string
+     * @return  self
+     */
+    public function havingRaw($string);
+
+    /**
      * build orHaving string
      *
      * @return  self

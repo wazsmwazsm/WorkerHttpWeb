@@ -63,31 +63,31 @@ CREATE TABLE public.t_company (
 
 -- sqlite
 CREATE TABLE t_user (
-   id int NOT NULL,
-   g_id int NOT NULL,
-   username varchar(40) NOT NULL,
-   email varchar(150) NOT NULL,
-   sort_num int NOT NULL,
-   activated smallint NOT NULL DEFAULT 0,
-   created int NOT NULL,
-   PRIMARY KEY (id)
+   id INTEGER NOT NULL,
+   g_id INTEGER NOT NULL,
+   username TEXT NOT NULL,
+   email TEXT NOT NULL,
+   sort_num INTEGER NOT NULL,
+   activated INTEGER NOT NULL DEFAULT 0,
+   created INTEGER NOT NULL,
+   PRIMARY KEY (id ASC)
 );
 CREATE INDEX index_g_id
 ON t_user (g_id);
 
 CREATE TABLE t_user_group (
-   id int NOT NULL,
-   c_id int NOT NULL,
-   groupname varchar(40) NOT NULL,
-   sort_num int NOT NULL,
-   created int NOT NULL,
-   PRIMARY KEY (id)
+   id INTEGER NOT NULL,
+   c_id INTEGER NOT NULL,
+   groupname TEXT NOT NULL,
+   sort_num INTEGER NOT NULL,
+   created INTEGER NOT NULL,
+   PRIMARY KEY (id ASC)
 );
 
 CREATE TABLE t_company (
-   id int NOT NULL,
-   companyname varchar(40) NOT NULL,
-   sort_num int NOT NULL,
-   created int NOT NULL,
-   PRIMARY KEY (id)
+   id INTEGER NOT NULL,
+   companyname TEXT NOT NULL,
+   sort_num INTEGER NOT NULL,
+   created INTEGER NOT NULL,
+   PRIMARY KEY (id ASC)
 );
