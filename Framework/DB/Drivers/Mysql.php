@@ -39,9 +39,9 @@ class Mysql extends PDODriver implements ConnectorInterface
     {
         extract($this->_config, EXTR_SKIP);
 
-        $dsn = 'mysql:dbname='.$dbname.
-               ';host='.$host.
-               (isset($port) ? ';port='.$port : '');
+        $dsn = isset($unix_socket) ?
+               'mysql:unix_socket='.$unix_socket.';dbname='.$dbname :
+               'mysql:dbname='.$dbname.';host='.$host.(isset($port) ? ';port='.$port : '');
 
         $options = isset($options) ? $options + $this->_options : $this->_options;
 
