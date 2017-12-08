@@ -528,59 +528,29 @@ class PDODQLTest extends TestCase
 
     public function testHaving()
     {
-        // pdo sqlite bug with prepare bindValue.
-        // exp: ' having count(some) < :some ' in sqlite will get wrong result
-        if(get_called_class() != 'SqliteDQLTest') {
-            // having 3 param
-            $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) < 20')
-                    ->fetchAll(PDO::FETCH_ASSOC);
+        // having 3 param
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) < 20')
+                ->fetchAll(PDO::FETCH_ASSOC);
 
-            $testResult = self::$db->table('user')
-                ->select('sort_num', 'COUNT(sort_num)')
-                ->groupBy('sort_num')
-                ->having('COUNT(sort_num)', '<', 20)
-                ->get();
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'COUNT(sort_num)')
+            ->groupBy('sort_num')
+            ->having('COUNT(sort_num)', '<', 20)
+            ->get();
 
-            $this->assertEquals($expect, $testResult);
+        $this->assertEquals($expect, $testResult);
 
-            // having 2 param
-            $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) = 3')
-                    ->fetchAll(PDO::FETCH_ASSOC);
+        // having 2 param
+        $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) = 3')
+                ->fetchAll(PDO::FETCH_ASSOC);
 
-            $testResult = self::$db->table('user')
-                ->select('sort_num', 'COUNT(sort_num)')
-                ->groupBy('sort_num')
-                ->having('count(sort_num)', 3)
-                ->get();
+        $testResult = self::$db->table('user')
+            ->select('sort_num', 'COUNT(sort_num)')
+            ->groupBy('sort_num')
+            ->having('count(sort_num)', 3)
+            ->get();
 
-            $this->assertEquals($expect, $testResult);
-
-        } else {
-            // having 3 param
-            $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) < 20')
-                    ->fetchAll(PDO::FETCH_ASSOC);
-
-            $testResult = self::$db->table('user')
-                ->select('sort_num', 'COUNT(sort_num)')
-                ->groupBy('sort_num')
-                ->havingRaw('COUNT(sort_num) < 20')
-                ->get();
-
-            $this->assertEquals($expect, $testResult);
-
-            // having 2 param
-            $expect = self::$pdo->query('SELECT sort_num, COUNT(sort_num) FROM t_user GROUP BY sort_num HAVING COUNT(sort_num) = 3')
-                    ->fetchAll(PDO::FETCH_ASSOC);
-
-            $testResult = self::$db->table('user')
-                ->select('sort_num', 'COUNT(sort_num)')
-                ->groupBy('sort_num')
-                ->havingRaw('COUNT(sort_num) = 3')
-                ->get();
-
-            $this->assertEquals($expect, $testResult);
-        }
-
+        $this->assertEquals($expect, $testResult);
 
         // having array param
         $expect = self::$pdo->query('SELECT sort_num, activated FROM t_user GROUP BY sort_num, activated HAVING sort_num = 20 AND activated = 0')

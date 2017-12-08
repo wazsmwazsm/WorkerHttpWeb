@@ -375,8 +375,24 @@ class PDODriver implements ConnectorInterface
     protected function _bindParams()
     {
         if(is_array($this->_bind_params)) {
+
             foreach ($this->_bind_params as $plh => $param) {
-                $this->_pdoSt->bindValue($plh, $param);
+
+                $data_type = PDO::PARAM_STR;
+
+                if(is_numeric($param)) {
+                    $data_type = PDO::PARAM_INT;
+                }
+
+                if(is_null($param)) {
+                    $data_type = PDO::PARAM_NULL;
+                }
+
+                if(is_bool($param)) {
+                    $data_type = PDO::PARAM_BOOL;
+                }
+
+                $this->_pdoSt->bindValue($plh, $param, $data_type);
             }
         }
     }
