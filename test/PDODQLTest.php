@@ -671,19 +671,6 @@ class PDODQLTest extends TestCase
             ->get();
 
         $this->assertEquals($expect, $testResult);
-
-        // right join ( sqlite not support)
-        if(get_called_class() != 'SqliteDQLTest') {
-            $expect = self::$pdo->query('SELECT t_user.username, t_user_group.groupname FROM t_user RIGHT JOIN t_user_group ON t_user.g_id = t_user_group.id')
-                    ->fetchAll(PDO::FETCH_ASSOC);
-            $testResult = self::$db->table('user')
-                ->select('user.username', 'user_group.groupname')
-                ->rightJoin('user_group', 'user.g_id', 'user_group.id')
-                ->get();
-
-            $this->assertEquals($expect, $testResult);
-        }
-
     }
 
     public function testComplex()
